@@ -1,0 +1,31 @@
+\documentclass[tikz]{standalone}
+\usepackage{pgfplots}
+%\pgfplotsset{width=7cm,compat=1.18}
+\usepgfplotslibrary{statistics}
+\def\axisdefaultwidth{6cm}
+\def\axisdefaultheight{6cm}
+%\pgfplotsset{every axis/.style={scale only axis}} 		
+\begin{document}
+\begin{tikzpicture}
+%\begin{axis}[small,ymin=0,title=\texttt{vcmmin}]
+\begin{axis}[small,ymin=0]
+\addplot [
+ybar,
+fill=blue!75,
+draw=blue]
+table [x=perf, y=cnt] {
+cnt                 perf                
+295.00000           0.70000             
+412.00000           0.74500             
+208.00000           0.79000             
+147.00000           0.83500             
+72.00000            0.88000             
+19.00000            0.92501             
+1.00000             0.97001             
+2.00000             1.01501             
+1.00000             1.06001             
+1.00000             1.10501             
+};
+\end{axis}
+\end{tikzpicture}
+\end{document}

@@ -1,0 +1,32 @@
+\documentclass[tikz]{standalone}
+\usepackage{pgfplots}
+%\pgfplotsset{width=7cm,compat=1.18}
+\usepgfplotslibrary{statistics}
+\def\axisdefaultwidth{6cm}
+\def\axisdefaultheight{6cm}
+%\pgfplotsset{every axis/.style={scale only axis}} 		
+
+\begin{document}
+\begin{tikzpicture}
+%\begin{axis}[small,ymin=0,title=\texttt{vomin}]
+\begin{axis}[small,ymin=0]
+\addplot [
+ybar,
+fill=blue!75,
+draw=blue]
+table [x=perf, y=cnt] {
+cnt                 perf                
+52.00000            0.71000             
+95.00000            0.73900             
+109.00000           0.76800             
+129.00000           0.79700             
+114.00000           0.82600             
+111.00000           0.85500             
+132.00000           0.88400             
+116.00000           0.91300             
+148.00000           0.94200             
+152.00000           0.97100             
+};
+\end{axis}
+\end{tikzpicture}
+\end{document}

@@ -1,0 +1,32 @@
+\documentclass[tikz]{standalone}
+\usepackage{pgfplots}
+%\pgfplotsset{width=7cm,compat=1.18}
+\usepgfplotslibrary{statistics}
+\def\axisdefaultwidth{6cm}
+\def\axisdefaultheight{6cm}
+%\pgfplotsset{every axis/.style={scale only axis}} 		
+
+\begin{document}
+\begin{tikzpicture}
+%\begin{axis}[small,ymin=0,title=\texttt{area}]
+\begin{axis}[small,ymin=0]
+\addplot [
+ybar,
+fill=blue!75,
+draw=blue]
+table [x=perf, y=cnt] {
+cnt                 perf                
+17.00000            1228.00000          
+72.00000            1987.50000          
+207.00000           2747.00000          
+258.00000           3506.50000          
+303.00000           4266.00000          
+181.00000           5025.50000          
+66.00000            5785.00000          
+33.00000            6544.50000          
+11.00000            7304.00000          
+10.00000            8063.50000          
+};
+\end{axis}
+\end{tikzpicture}
+\end{document}

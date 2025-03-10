@@ -1,0 +1,194 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+%\usepackage{algorithmic}
+\usepackage[]{algorithm2e} 
+\usepackage{subcaption}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{booktabs}
+\usepackage{xcolor}
+%\usepackage{xcolor}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+%\setlength\textfloatsep{5pt}  % separation of floats on bottom or top of page
+%\setlength\intextsep{5pt}  % separation of floats inbetween text
+
+\title{Inverse Sizing and Exploration Based on Diffusion Models and Structural Knowledge
+\thanks{Parts of this work have been done within the collaborative project HoLoDEC funded by the Federal Ministry of Education and Research Germany (BMBF) under the funding code 16ME0705.}}
+
+%\author{\IEEEauthorblockN{Markus Leibl}
+%\IEEEauthorblockA{\textit{Chair of Electronic Design Automation} \\
+%\textit{Technical University of Munich}\\
+%Munich, Germany \\
+%markus.leibl@tum.de}
+%\and
+%\IEEEauthorblockN{Helmut Graeb}
+%\IEEEauthorblockA{\textit{Chair of Electronic Design Automation} \\
+%\textit{Technical University of Munich}\\
+%Munich, Germany \\
+%helmut.graeb@tum.de}
+%}
+
+
+\maketitle
+
+\begin{abstract}
+Quick and effortless exploration of design spaces is of major importance in the face of rapid development cycles, varying specifications and increasingly complex circuits.
+It is also well known, that the exploitation of slack in specifications by making adjustments to transistor device sizes can lead to improved yield.
+We address those challenges by combining two state of the art machine learning approaches to achieve accurate generation of optimal performance points, while also allowing for the possibility to explore nearby sizings that might lead to more robust designs. To this end, a diffusion model is combined with an algorithm, that analyzes the circuit and splits the problem into simpler subproblems. The models are tested on a set of typical operational amplifiers.
+\end{abstract}
+
+%\begin{IEEEkeywords}
+%component, formatting, style, styling, insert
+%\end{IEEEkeywords}
+
+\section{Introduction}
+	Since the development of SPICE, the industry accepted method for designing analog circuits has not changed much. While the SPICE models keep becoming more complex \cite{gatermann22mosfet}, the approach of manual device tuning persists \cite{gielen23workshop}. Key challenges of making analog CAD tools useful in practice are robustness, ease of use and applicability to a high range of use cases. All those aspects are not easy to grasp on a fundamental level. On the other hand, machine learning approaches excel in modeling nonlinear black box phenomena. Their combination with already existing conventional techniques has a high potential to bridge remaining gaps, that prevent the adoption of tools in industry.
+	
+	Analog design is inherently an inverse problem. While the calculation of performances, yield etc., is satisfactorily possible via simulation, the inverse, i.e. getting a circuit with optimal parametrization requires experience, trial and error and complex numerical routines. As shown in previous works \cite{ leibl24inverse, lourenco19pareto}, machine learning methods can be used to accurately reproduce sizings on (pareto) optimal fronts. Furthermore, it has been shown \cite{eid24diffusion} that diffusion models are well adaptable to the inverse sizing problem.
+	
+	
+	
+	
+	can produce a more varied set of possible sizings, which is very helpful when exploring sizing options in the vicinity of performance optima. 
+	
+	In this work, we present an approach to inverse sizing that
+	\begin{itemize}
+	\item suggests valid sizings for 
+	\end{itemize}
+	
+
+    With increasing MOSFET model complexity \cite{gatermann22mosfet}, analog design, particularly OpAmp design, remains manual in industrial practice \cite{gielen23workshop}, despite the existence of automatic tools. Various procedural methods for automated design have been discussed in \cite{prautsch16reuse, crossley13bag, schweikardt22scheible}. The idea of using smaller building blocks and hierarchical strategies is successfully demonstrated, e.g., in \cite{meissner15feats, abel2022fuboco, mendhurwar2012structureneural, synthesis23zhang, canelas22hierachical}. 
+	Early on, modeling  performance characteristics of circuits has been popular, e.g. by symbolic analysis \cite{cuatle10symbolic, wambacq95symbolic}. % or machine learning \cite{doboli03piecewise}.
+	Some prior works in the machine learning realm follow the idea of skipping or replacing the optimization algorithm by other means such as neural networks (NNs). In~\cite{lourenco18}, artificial neural networks (ANNs) are used to guess circuit sizings; due to modeling the entire netlist with one ANN and including non-optimal results in the former case, the complexity of the learning task is higher and thus large sample sizes (in \cite{lourenco18} $16600$ or roughly $16-160 \, x$ our sample sizes) are required to learn the inverse problem within a smaller performance range. Similarly to our work,  \cite{lourenco19pareto} uses optimal samples for training but without exploiting structural knowledge. In~\cite{gao23rose, settaluri22reinforcement}, reinforcement  algorithms are presented, substituting the optimizer with an NN.
+%	 while maintaining an iterative nature. 
+	 Here, the simulation effort is increased as multiple rounds are required for every sizing, similar to traditional optimization. In~\cite{beaulieu23cascaded}, the complexity of the NNs is reduced by having small networks represent single device parameters and cascading them in different ways, feeding outputs of earlier networks to the input of later networks in the tree.
+	 Unfortunately, with a circuit of e.g. $15$ devices/networks, optimally ordering them in a chain can lead to a complexity of $15!$ in the worst case.
+	Other works, such as \cite{fayazi23angel, budak23apostle, wolfe03nnmodel, hakhamaneshi23pretraining}, follow the traditional approach of treating sizing as an optimization problem or concentrate on performance modeling. While achieving good accuracy in their findings, they contend with the costly iteration process inherent in optimization.
+\newline
+	In this paper, utilizing sampled sizings from the open-source tool FUBOCO \cite{fuboco-github}, we introduce a machine learning algorithm for sizing operational amplifiers \textbf{without the need for optimization and simulation} during the deployment phase. 
+	\newline
+	Our approach stands out by \textbf{capitalizing on automatically extracted structural} and \textbf{functional information}, a departure from related works. This brings about benefits in terms of speed, flexibility, and accuracy. The required sample size, setup- and evaluation-time, as well as necessary expert knowledge are kept at a minimum. Additional contributions include the creation of a comprehensive database of netlists, the development of a custom loss function, and the utilization of a quasi-Newton optimizer for training purposes.
+\newline
+	 In section \ref{sec:intro2}, we provide an overview of the proposed method and its connection to structural analysis. 
+	 In sec.~\ref{sec:sizing}, we describe the sizing process in detail. We conclude with a presentation of results for two OpAmps.
+	 
+	 	
+ 	\section{From Structural Analysis to Circuit Sizing via Machine Learning}\label{sec:intro2}
+	\begin{figure}[h]
+		\centering
+        \includegraphics[width=\linewidth]{figures/struct_overview_incl_partition}
+		\setlength{\abovecaptionskip}{0ex}%
+		\setlength{\belowcaptionskip}{-2ex}%
+		\caption{Splitting various OpAmps into canonical building blocks with different functional characteristics and accumulating intrinsic design know-how by training each building block with random optimal samples from all available OpAmps. Indices {\color{red} $b$}, {\color{blue} $l$} and {\color{green} $t$} represent {\color{red}$bias$}, {\color{blue}$load$} and {\color{green}$transconductance$} functionality of devices. Every building block maps the overall OpAmp performance to its sizing.}
+		\label{fig:overview-structure}
+	\end{figure}
+	\setlength{\abovecaptionskip}{1ex}%
+	\setlength{\belowcaptionskip}{-3ex}%
+ 	\subsection{Basics of Structural and Functional Blocks}
+ 	Our method heavily relies on decomposing circuits into subcircuits, which we call structural building blocks. Most building blocks are known to the analog designer by names such as \textit{current mirror} or \textit{differential pair}.
+
+	We further distinguish different functional variants of one and the same structural block.
+	To this end, we assign to every transistor in a circuit its functional property, out of three different possibilities: \textit{bias, load} or \textit{transconductance}. 
+	 For example, a \textit{simple current mirror} (scm) can act as \textit{load}, but in other parts of a circuit, the same building block can act as \textit{bias}. And sometimes, some part of a current mirror can act as \textit{load}, while another part acts as \textit{bias}. Figure~\ref{fig:overview-structure} shows all structural blocks and their functional variants from our dataset.
+	An example of decomposing a Folded-Cascode OpAmp into blocks can be seen in figure~\ref{fig:simple53}. Its structural building blocks are shaded, the names annotated close by.
+	Structural and functional block recognition is fully automated. The time required for this is much less than one second. 
+	
+\subsection{Overview of the Method}
+
+	\begin{figure}[]
+		\begin{subfigure}{.48\textwidth}
+			\centering
+			\includegraphics[width=\linewidth]{figures/simple52_partitioning}
+			\setlength{\abovecaptionskip}{0ex}%
+	%		\setlength{\belowcaptionskip}{-2ex}%
+			\setlength{\belowcaptionskip}{0ex}%
+			\caption{Folded Cascode Operational Amplifier (OpAmp A).}
+			\label{fig:simple53}
+		\end{subfigure}
+			\hfill
+		\begin{subfigure}{.5\textwidth}
+			\centering
+			\includegraphics[width=\linewidth]{figures/finetuning-networks2}
+			\setlength{\abovecaptionskip}{-2ex}%
+	%		\setlength{\belowcaptionskip}{-2ex}%
+			\caption{Process of transfer learning.}
+			\label{fig:fine-tuning}
+		\end{subfigure}
+			\setlength{\abovecaptionskip}{3ex}%
+			\setlength{\belowcaptionskip}{-3ex}%
+%			\caption{Folded Cascode OpAmp (\ref{fig:simple53}) and process of transfer learning (\ref{fig:fine-tuning}): Instead of training one huge network per OpAmp, we can use weights from our database as initial training points to merely fine-tune our networks }
+			\caption{Instead of training one huge network per OpAmp, we can split an Opamp, e.g. OpAmp A, into blocks (shading and coloring in fig.~\ref{fig:simple53}) and use weights from our network-database as initial training points to merely fine-tune our networks~(\ref{fig:fine-tuning}). }
+			\label{fig:training-process}
+		\end{figure}
+		
+		\begin{figure}[]
+		\begin{subfigure}{0.12\textwidth}
+		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/gain}}
+		\vspace{-1.4\baselineskip}
+		\caption{{\footnotesize gain ($dB$)}}
+		\label{fig:53gain}
+		\vspace{1.3\baselineskip}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}{0.12\textwidth}
+		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/ft}}
+		\vspace{-1.4\baselineskip}
+		\caption{{\footnotesize trns. fr. ($Mhz$)}}
+		\label{fig:53ft}
+		\vspace{1.3\baselineskip}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}{0.12\textwidth}
+		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/slew}}
+		\vspace{-1.4\baselineskip}
+		\caption{{\footnotesize slew rate ($\frac{V}{\mu s}$)}}
+		\label{fig:53slew}
+		\vspace{1.3\baselineskip}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}{0.12\textwidth}
+		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/power}}
+		\vspace{-1.4\baselineskip}
+		\caption{{\footnotesize power ($mW$)}}
+		\label{fig:53pow}
+	%	\vspace{.4\baselineskip}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}{0.12\textwidth}
+		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/phase}}
+		\vspace{-1.4\baselineskip}
+		\caption{{\footnotesize phase margin}}
+		\label{fig:53ph}
+	%	\vspace{.4\baselineskip}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}{0.12\textwidth}
+		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/cmrr}}
+		\vspace{-1.4\baselineskip}
+		\caption{{\footnotesize CMRR}}
+		\label{fig:53cmrr}
+	%	\vspace{.4\baselineskip}
+		\end{subfigure}
+		\setlength{\abovecaptionskip}{4ex}%
+		\setlength{\belowcaptionskip}{-4ex}%
+		\caption{Histograms of some performance features for the Folded-Cascode OpAmp in Fig.~\ref{fig:simple53}.}
+		\label{fig:perffeatures53}
+		\end{figure}
+	
+
+	
+	
+\section{Conclusion}
+	
+
+\bibliographystyle{IEEEtran}
+\bibliography{IEEEabrv,bibtex-base-iee}
+
+\end{document}

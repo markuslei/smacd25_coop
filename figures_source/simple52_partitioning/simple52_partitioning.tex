@@ -1,0 +1,125 @@
+%\documentclass[tikz, border=20]{standalone}
+%\documentclass[tikz]{standalone}
+%\documentclass[border=1mm]{standalone}
+\documentclass[]{standalone}
+\usepackage{tikz}
+\usepackage[siunitx]{circuitikz} % Loading circuitikz with siunitx option
+\usetikzlibrary{calc}
+
+
+\begin{document}
+	\begin{circuitikz}
+		\ctikzset{tripoles/mos style=arrows}
+		\ctikzset{transistors/arrow pos=end}
+		
+		\tikzstyle{every node}=[font=\large]
+		\newcommand{\diodecon}[1]{\draw (#1.gate) node[circ]{} |-  (#1.drain) node[circ]{}}
+
+		\coordinate (start) at (0,0);
+		
+		%scm3
+		\draw (start) node[nmos, anchor=source, xscale=-1, color=red](m1){};
+		\draw (start) ++(3,0) node[nmos, anchor=source, color=red](m6){};
+		\diodecon{m1};
+		\draw (m1.source) -- (m6.source) node[circ]{};
+		\draw (m1.gate) -- (m6.gate);
+		\draw (m1.D) +(0,1) to[short, o-, i=$I_{b}$] (m1.D); %Bias current in
+		\draw (m1.base) node[left=30, text=red]{$M1$};
+		\draw (m6.S) node[above left, text=red]{$M6$};
+		
+		%scm2
+		\draw (start) ++(10,0) node[nmos, anchor=source, color=red](m11){};
+		\draw (m11.base) node[right=30, text=red]{$M11$};
+		\draw (m6.S) -- (m11.S) node[circ]{};
+		\draw (m11.G) -- (m6.G);
+		
+		%ccm1
+		\coordinate (ccm1s) at ($(m6.source)+(2.5,1)$);
+		\draw (ccm1s) node[nmos, anchor=source, xscale=-1](m2){};
+		\draw (ccm1s) ++(9,0) node[nmos, anchor=source](m8){};
+		\draw (ccm1s) ++(0,2) node[nmos, anchor=source, xscale=-1](m3){};
+		\draw (ccm1s) ++(9,2) node[nmos, anchor=source](m7){};
+		\diodecon{m2};
+		\diodecon{m3};
+		\draw (m2.S) |- node[circ]{} (m6.S);
+		\draw (m8.S) |- (m11.S);
+		\draw (m2.D) -- (m3.S);
+		\draw (m8.D) -- (m7.S);
+		\draw (m2.G) -- (m8.G);
+		\draw (m3.G) -- (m7.G);
+		\draw (m2.base) node[left=30]{$M2$};
+		\draw (m3.base) node[left=30]{$M3$};
+		\draw (m8.base) node[right=30]{$M8$};
+		\draw (m7.base) node[right=30]{$M7$};
+		
+		%dp
+		\coordinate (P) at ($(m11.D)+(0,3)$);
+		\draw (P) ++(-1.2,0) node[nmos, anchor=source, color=green](m9){};
+		\draw (P) ++(1.2,0) node[nmos, anchor=source, xscale=-1, color=green](m10){};
+		\draw (m9.source) |- (P) node[circ]{};
+		\draw (P) -| (m10.source);
+		\draw (m11.drain) -- (P);
+		\draw (m10.G) ++(0,0) to[short, o-] (m10.G);
+		\draw (m9.G) ++(0,0) to[short, o-] (m9.G);
+		\draw (m10.G) ++(.75, 0)  node[](vinm){$V_{in-}$};
+		\draw (m9.G) ++(-.75,0)  node[](vinp){$V_{in+}$};
+		\draw (m10.base) node[left=30, text=green]{$M10$};
+		\draw (m9.base) node[right=30, text=green]{$M9$};
+		
+		%ccm2
+		\coordinate (ccm2s) at ($(m6.D)+(0,4)$);
+		\draw (ccm2s) node[pmos, anchor=drain, xscale=-1, color=red](m4){};
+		\draw (ccm2s) ++(2.5,0) node[pmos, anchor=drain](m13){};
+		\draw (m4.source) node[pmos, anchor=drain, xscale=-1, color=red](m5){};
+		\draw (m13.source) node[pmos, anchor=drain](m14){};
+		\diodecon{m4};
+		\diodecon{m5};
+		\draw (m4.D) -- (m6.D);
+		\draw (m13.D) -- (m3.D);
+		\draw (m5.D) -- (m4.S);
+		\draw (m14.D) -- (m13.S);
+		\draw (m5.S) -- (m14.S) node[circ]{};
+		\draw (m5.G) -- (m14.G);
+		\draw (m4.G) -- (m13.G);
+		\draw (m9.D) |- (m13.S) node[circ]{};
+		\draw (m4.base) node[left=30, text=red]{$M4$};
+		\draw (m5.base) node[left=30, text=red]{$M5$};
+		\draw (m13.D) node[above left]{$M13$};
+		\draw (m14.D) node[above left]{$M14$};
+		
+		%ccm3
+		\draw (ccm2s) ++(11.5,0) node[pmos, anchor=drain](m12){};
+		\draw (m12.S) node[pmos, anchor=drain](m15){};
+		\draw (m12.D) -- (m7.D);
+		\draw (m12.G) -- (m13.G);
+		\draw (m15.G) -- (m14.G);
+		\draw (m15.S) -- (m14.S);
+		\draw (m10.D) |- (m12.S) node[circ]{};
+		\draw ($(m12.D)!0.5!(m7.D)$) to[short, *-o] ++(1,0) node[above left=-.3]{$V_{out}$};
+		\draw (m12.base) node[right=30]{$M12$};
+		\draw (m15.base) node[right=30]{$M15$};
+
+		\newcommand\strmargin{0.1}
+		\fill[fill=yellow!80!black, opacity=0.2] (start) ++(-.3, -.3) -- ($(m1.D)+(-.3,\strmargin)$) -- ++(1.5,0) -- ++(0,-1.5) -- ++(8,0) -- ++(0,1.5) -- ($(m11.D)+(.3,\strmargin)$) -- ($(m11.S)+(.3,-.3)$) -- cycle;
+		\path (m11.S) ++(-0.2,-.3) node[]{$\text{scm}_2$};
+		\fill[fill=yellow!80!black, opacity=0.4] (start) ++(-\strmargin, -\strmargin) rectangle ($(m6.D)+(\strmargin,0)$);
+		\path (start) ++(0,-.3) node[]{$\text{scm}_1$};
+		\fill[fill=yellow!80!black, opacity=0.2] (m2.S) ++(-\strmargin, -\strmargin) -- ($(m3.D)+(-\strmargin,\strmargin)$) -- ++(1.5,0) -- ++(0,-1) -- ++(6.5,0) -- ++(0,1) --  ($(m7.D)+(\strmargin,\strmargin)$) -- ($(m8.S)+(\strmargin,-\strmargin)$) -- ++(-1.25, 0) -- ++(0, 1) -- ++(-6.5, 0) -- ++(0, -1) -- cycle;
+		\path (m8.S) ++(-0.6,0) node[]{$\text{ccm}_1$};
+		
+		\fill[fill=yellow!80!black, opacity=0.2] (m9.S) ++(-1.1, -\strmargin) rectangle ($(m10.D)+(1.1,\strmargin)$);
+		\path (m9.S) ++(-.6,0) node[]{$\text{dp}_1$};
+		
+		\fill[fill=yellow!80!black, opacity=0.2] (m4.D) ++(-.3, -.3) -- ($(m5.S)+(-.3,.3)$) -- ($(m15.S)+(.3,.3)$) -- ($(m12.D)+(.3,-.3)$) -- ++(-1.5, 0) -- ++(0, 3) -- ++(-9., 0) -- ++(0, -3) -- cycle;
+		\path (m12.D) ++(-0.6,0) node[]{$\text{ccm}_3$};
+		
+		\fill[fill=yellow!80!black, opacity=0.4] (m4.D) ++(-\strmargin, -\strmargin) rectangle ($(m14.S)+(\strmargin,\strmargin)$);
+		\path (m13.D) ++(-.5,-.3) node[]{$\text{ccm}_2$};
+		
+		\coordinate (legend) at (0,6);
+		\draw[thick] (legend) -- ++(.5,.5) node[below right]{load};
+		\draw[thick, color=red] (legend) ++(0,-1) -- ++(.5,.5) node[below right]{bias};
+		\draw[thick, color=green] (legend) ++(0,-2) -- ++(.5,.5) node[below right]{transc.};
+
+	\end{circuitikz}
+\end{document}

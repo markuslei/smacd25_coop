@@ -1,0 +1,32 @@
+\documentclass[tikz]{standalone}
+\usepackage{pgfplots}
+%\pgfplotsset{width=7cm,compat=1.18}
+\usepgfplotslibrary{statistics}
+\def\axisdefaultwidth{6cm}
+\def\axisdefaultheight{6cm}
+%\pgfplotsset{every axis/.style={scale only axis}} 		
+
+\begin{document}
+\begin{tikzpicture}
+%\begin{axis}[small,ymin=0,title=\texttt{vomax}]
+\begin{axis}[small,ymin=0]
+\addplot [
+ybar,
+fill=blue!75,
+draw=blue]
+table [x=perf, y=cnt] {
+cnt                 perf                
+58.00000            3.58001             
+69.00000            3.63601             
+93.00000            3.69201             
+127.00000           3.74801             
+148.00000           3.80401             
+230.00000           3.86001             
+146.00000           3.91601             
+98.00000            3.97201             
+132.00000           4.02801             
+57.00000            4.08401             
+};
+\end{axis}
+\end{tikzpicture}
+\end{document}

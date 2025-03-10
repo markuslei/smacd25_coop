@@ -1,0 +1,208 @@
+%\documentclass[tikz, border=20]{standalone}
+%\documentclass[tikz]{standalone}
+%\documentclass[border=1mm]{standalone}
+\documentclass[]{standalone}
+\usepackage{tikz}
+\usepackage[siunitx]{circuitikz} % Loading circuitikz with siunitx option
+\usetikzlibrary{calc}
+
+
+\begin{document}
+	\begin{circuitikz}
+		\ctikzset{tripoles/mos style=arrows}
+		\ctikzset{transistors/arrow pos=end}
+		
+		\tikzstyle{every node}=[font=\normalsize]
+		\newcommand{\diodecon}[1]{\draw (#1.gate) node[circ]{} |-  (#1.drain) node[circ]{}}
+
+		\coordinate (start) at (0,0);
+		
+		%scm3
+		\draw (start) node[nmos, anchor=source, xscale=-1](m1){};
+		\draw (start) ++(3,0) node[nmos, anchor=source](m6){};
+		\diodecon{m1};
+		\draw (m1.source) -- (m6.source) node[circ]{};
+		\draw (m1.gate) -- (m6.gate);
+		\draw (m1.D) +(0,1) to[short, o-, i=$I_{b}$] (m1.D); %Bias current in
+		\draw (m1.base) node[left=30]{$M1$};
+		\draw (m6.S) node[above left]{$M6$};
+		
+		%scm2
+		\draw (start) ++(12,0) node[nmos, anchor=source](m11){};
+		\draw (m11.base) node[right=30]{$M11$};
+		\draw (m6.S) -- (m11.S) node[circ]{};
+		\draw (m11.G) -- (m6.G);
+		
+		%ccm1
+		\coordinate (ccm1s) at ($(m6.source)+(3,1)$);
+		\draw (ccm1s) node[nmos, anchor=source, xscale=-1](m2){};
+		\draw (ccm1s) ++(12,0) node[nmos, anchor=source](m8){};
+		\draw (ccm1s) ++(0,2) node[nmos, anchor=source, xscale=-1](m3){};
+		\draw (ccm1s) ++(12,2) node[nmos, anchor=source](m7){};
+		\diodecon{m2};
+		\diodecon{m3};
+		\draw (m2.S) |- node[circ]{} (m6.S);
+		\draw (m8.S) |- (m11.S);
+		\draw (m2.D) -- (m3.S);
+		\draw (m8.D) -- (m7.S);
+		\draw (m2.G) -- (m8.G);
+		\draw (m3.G) -- (m7.G);
+		\draw (m2.base) node[left=30]{$M2$};
+		\draw (m3.base) node[left=30]{$M3$};
+		\draw (m8.base) node[right=30]{$M8$};
+		\draw (m7.base) node[right=30]{$M7$};
+		
+		%dp
+		\coordinate (P) at ($(m11.D)+(0,3)$);
+		\draw (P) ++(-2,0) node[nmos, anchor=source](m9){};
+		\draw (P) ++(2,0) node[nmos, anchor=source, xscale=-1](m10){};
+		\draw (m9.source) |- (P) node[circ]{};
+		\draw (P) -| (m10.source);
+		\draw (m11.drain) -- (P);
+		\draw (m10.G) ++(0,0) to[short, o-] (m10.G);
+		\draw (m9.G) ++(0,0) to[short, o-] (m9.G);
+		\draw (m10.G) ++(.75, 0)  node[](vinm){$V_{in-}$};
+		\draw (m9.G) ++(-.75,0)  node[](vinp){$V_{in+}$};
+		\draw (m10.base) node[left=30]{$M10$};
+		\draw (m9.base) node[right=30]{$M9$};
+		
+		%ccm2
+		\coordinate (ccm2s) at ($(m6.D)+(0,4)$);
+		\draw (ccm2s) node[pmos, anchor=drain, xscale=-1](m4){};
+		\draw (ccm2s) ++(3,0) node[pmos, anchor=drain](m13){};
+		\draw (m4.source) node[pmos, anchor=drain, xscale=-1](m5){};
+		\draw (m13.source) node[pmos, anchor=drain](m14){};
+		\diodecon{m4};
+		\diodecon{m5};
+		\draw (m4.D) -- (m6.D);
+		\draw (m13.D) -- (m3.D);
+		\draw (m5.D) -- (m4.S);
+		\draw (m14.D) -- (m13.S);
+		\draw (m5.S) -- (m14.S) node[circ]{};
+		\draw (m5.G) -- (m14.G);
+		\draw (m4.G) -- (m13.G);
+		\draw (m9.D) |- (m13.S) node[circ]{};
+		\draw (m4.base) node[left=30]{$M4$};
+		\draw (m5.base) node[left=30]{$M5$};
+		\draw (m13.D) node[above left]{$M13$};
+		\draw (m14.D) node[above left]{$M14$};
+		
+		%ccm3
+		\draw (ccm2s) ++(15,0) node[pmos, anchor=drain](m12){};
+		\draw (m12.S) node[pmos, anchor=drain](m15){};
+		\draw (m12.D) -- (m7.D);
+		\draw (m12.G) -- (m13.G);
+		\draw (m15.G) -- (m14.G);
+		\draw (m15.S) -- (m14.S);
+		\draw (m10.D) |- (m12.S) node[circ]{};
+		\draw ($(m12.D)!0.5!(m7.D)$) to[short, *-o] ++(1,0) node[above left=-.3]{$V_{out}$};
+		\draw (m12.base) node[right=30]{$M12$};
+		\draw (m15.base) node[right=30]{$M15$};
+
+%\draw (5,14.25) to[Tnmos] (5,10.75); 
+%%\draw (5.85,12.5) to[short] (6,12.5);
+%%\draw (5,13.5) to[Tnmos] (5,10); 
+%%\draw (5.85,11.75) to[short] (6,11.75);
+%\draw (10,10.75) to[Tnmos] (10,14.25); 
+%\draw (9.15,12.5) to[short] (9,12.5);
+%\draw [short] (5,10.75) .. controls (7.5,10.75) and (7.5,10.75) .. (10,10.75);
+%\draw [short] (6,12.5) .. controls (7.5,12.5) and (7.5,12.5) .. (9,12.5);
+%\draw (5,13.75) to[short, -*] (5,13.75);
+%\draw (6.25,12.5) to[short, -*] (6.25,12.5);
+%\draw (15,15) to[Tnmos] (15,12.5); 
+%\draw (15.85,13.75) to[short] (16,13.75);
+%\draw (15,17.25) to[Tnmos] (15,15.25); 
+%\draw (15.85,16.25) to[short] (16,16.25);
+%\draw (22.5,11.5) to[Tnmos] (22.5,13.5); 
+%\draw (21.65,12.5) to[short] (21.5,12.5);
+%\draw (20,17.5) to[Tnmos] (20,20); 
+%\draw (19.15,18.75) to[short] (19,18.75);
+%\draw (25,20) to[Tnmos] (25,17.5); 
+%\draw (25.85,18.75) to[short] (26,18.75);
+%\draw (30,12.5) to[Tnmos] (30,15); 
+%\draw (29.15,13.75) to[short] (29,13.75);
+%\draw (30,15.25) to[Tnmos] (30,17.25); 
+%\draw (29.15,16.25) to[short] (29,16.25);
+%\draw (10,23.5) to[Tpmos] (10,21.5); 
+%\draw (10.85,22.5) to[short] (11,22.5);
+%\draw (10,21.25) to[Tpmos] (10,18.75); 
+%\draw (10.85,20) to[short] (11,20);
+%\draw (15,21.5) to[Tpmos] (15,23.5); 
+%\draw (14.15,22.5) to[short] (14,22.5);
+%\draw (15,19) to[Tpmos] (15,21); 
+%\draw (14.15,20) to[short] (14,20);
+%\draw (30,21.25) to[Tpmos] (30,23.75); 
+%\draw (29.15,22.5) to[short] (29,22.5);
+%\draw (30,18.75) to[Tpmos] (30,21.25); 
+%\draw (29.15,20) to[short] (29,20);
+%\draw [short] (9.25,12.5) .. controls (15.5,12.5) and (15.5,12.5) .. (21.5,12.5);
+%\draw [short] (30,15.25) .. controls (30,15) and (30,15) .. (30,15);
+%\draw [short] (15,15.25) .. controls (15,15) and (15,15) .. (15,15);
+%\draw [short] (16,13.75) .. controls (22.5,13.75) and (22.5,13.75) .. (29,13.75);
+%\draw [short] (16,16.25) .. controls (22.5,16.25) and (22.5,16.25) .. (29,16.25);
+%\draw [short] (11,22.5) .. controls (20,22.5) and (20,22.5) .. (29,22.5);
+%\draw [short] (11,20) .. controls (20,20) and (20,20) .. (29,20);
+%\draw [short] (25,20.25) .. controls (25,20.75) and (25,20.75) .. (25,21.25);
+%\draw [short] (25,21.25) .. controls (27.5,21.25) and (27.5,21.25) .. (30,21.25);
+%\draw [short] (20,20) .. controls (20,20.5) and (20,20.5) .. (20,21.25);
+%\draw [short] (20,21.25) .. controls (17.5,21.25) and (17.5,21.25) .. (15,21.25);
+%\draw [short] (15,21.5) .. controls (15,21.25) and (15,21.25) .. (15,21);
+%\draw [short] (20,17.5) .. controls (22.5,17.5) and (22.5,17.5) .. (25,17.5);
+%\draw [short] (15,19) .. controls (15,18) and (15,18) .. (15,17.25);
+%\draw [short] (5,13.75) .. controls (5.75,13.75) and (5.75,13.75) .. (6.25,13.75);
+%\draw [short] (6.25,13.75) .. controls (6.25,13) and (6.25,13) .. (6.25,12.5);
+%\draw [short] (11.25,20) .. controls (11.25,19.25) and (11.25,19.25) .. (11.25,18.75);
+%\draw [short] (11.25,18.75) .. controls (10.75,18.75) and (10.75,18.75) .. (10,18.75);
+%\draw [short] (11.25,22.5) .. controls (11.25,21.75) and (11.25,21.75) .. (11.25,21.25);
+%\draw [short] (11.25,21.25) .. controls (10.75,21.25) and (10.75,21.25) .. (10,21.25);
+%\draw [short] (10,18.75) .. controls (10,16.5) and (10,16.5) .. (10,14.25);
+%\draw [short] (22.5,13.5) .. controls (22.5,15.5) and (22.5,15.5) .. (22.5,17.5);
+%\draw [short] (15,12.5) .. controls (15,11.5) and (15,11.5) .. (15,10.75);
+%\draw [short] (10,10.75) .. controls (20,10.75) and (20,10.75) .. (30,10.75);
+%\draw [short] (30,12.5) .. controls (30,11.5) and (30,11.5) .. (30,10.75);
+%\draw [short] (22.5,11.5) .. controls (22.5,11) and (22.5,11) .. (22.5,10.75);
+%\draw [short] (25,20.25) .. controls (25,20) and (25,20) .. (25,20);
+%\draw [short] (30,18.75) .. controls (30,18) and (30,18) .. (30,17.25);
+%\draw [short] (10,21.5) .. controls (10,21.25) and (10,21.25) .. (10,21.25);
+%\draw [short] (10,24.5) .. controls (20,24.5) and (20,24.5) .. (30,24.5);
+%\draw [short] (30,24.5) .. controls (30,24) and (30,24) .. (30,23.75);
+%\draw [short] (15,23.5) .. controls (15,24) and (15,24) .. (15,24.5);
+%\draw [short] (10,23.5) .. controls (10,24) and (10,24) .. (10,24.5);
+%\draw [](26,18.75) to[short, -o] (26.25,18.75);
+%\draw [](19,18.75) to[short, -o] (18.75,18.75);
+%\draw [](30,18.25) to[short, -o] (31,18.25);
+%\draw (15,24.5) to[short, -*] (15,24.5);
+%\draw (30,21.25) to[short, -*] (30,21.25);
+%\draw (15,21.25) to[short, -*] (15,21.25);
+%\draw (22.5,17.5) to[short, -*] (22.5,17.5);
+%\draw (11.25,20) to[short, -*] (11.25,20);
+%\draw (10,18.75) to[short, -*] (10,18.75);
+%\draw (11.25,22.5) to[short, -*] (11.25,22.5);
+%\draw (10,21.25) to[short, -*] (10,21.25);
+%\node [font=\normalsize] at (26.5,19) {$V_{in-}$};
+%\node [font=\normalsize] at (18.5,19) {$V_{in+}$};
+%\node [font=\normalsize] at (30.75,18.5) {$out$};
+%\draw [->, >=Stealth] (5,14.75) .. controls (5,14.5) and (5,14.5) .. (5,14.25);
+%\draw [](5,14.75) to[short, -o] (5,15);
+%\node [font=\normalsize] at (5.75,14.5) {$ibias$};
+%\node [font=\normalsize] at (4.5,12.5) {$M1$};
+%\node [font=\normalsize] at (14.5,13.75) {$M2$};
+%\node [font=\normalsize] at (14.5,16.25) {$M3$};
+%\node [font=\normalsize] at (9.5,20) {$M4$};
+%\node [font=\normalsize] at (9.5,22.5) {$M5$};
+%\node [font=\normalsize] at (9.25,11.5) {$M6$};
+%\node [font=\normalsize] at (30.5,16.25) {$M7$};
+%\node [font=\normalsize] at (30.5,13.75) {$M8$};
+%\node [font=\normalsize] at (20.5,18.75) {$M9$};
+%\node [font=\normalsize] at (24.5,18.75) {$M10$};
+%\node [font=\normalsize] at (23,12.5) {$M11$};
+%\node [font=\normalsize] at (30.5,20) {$M12$};
+%\node [font=\normalsize] at (14,19) {$M13$};
+%\node [font=\normalsize] at (14,21.5) {$M14$};
+%\node [font=\normalsize] at (30.5,22.5) {$M15$};
+%\draw [](5,14.75) to[short, -o] (5,15);
+%\draw [](5,14.75) to[short, -o] (5,15);
+%\draw [](5,14.75) to[short, -o] (5,15);
+
+	\end{circuitikz}
+\end{document}

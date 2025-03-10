@@ -1,0 +1,560 @@
+ %\documentclass[tikz, border=20]{standalone}
+ %\documentclass[tikz]{standalone}
+ %\documentclass[border=1mm]{standalone}
+ \documentclass[]{standalone}
+ \usepackage{tikz}
+ \usepackage[siunitx]{circuitikz} % Loading circuitikz with siunitx option
+ \usetikzlibrary{calc}
+ \usetikzlibrary{shapes.symbols}
+ \usepackage{etoolbox}
+ \usepackage{xcolor}
+ \usepackage{bm}
+ 
+ \makeatletter
+ \tikzset{
+ 	database/.style={
+ 		path picture={
+ 			\draw (0, 1.5*\database@segmentheight) circle [x radius=\database@radius,y radius=\database@aspectratio*\database@radius];
+ 			\draw (-\database@radius, 0.5*\database@segmentheight) arc [start angle=180,end angle=360,x radius=\database@radius, y radius=\database@aspectratio*\database@radius];
+ 			\draw (-\database@radius,-0.5*\database@segmentheight) arc [start angle=180,end angle=360,x radius=\database@radius, y radius=\database@aspectratio*\database@radius];
+ 			\draw (-\database@radius,1.5*\database@segmentheight) -- ++(0,-3*\database@segmentheight) arc [start angle=180,end angle=360,x radius=\database@radius, y radius=\database@aspectratio*\database@radius] -- ++(0,3*\database@segmentheight);
+ 		},
+ 		minimum width=2*\database@radius + \pgflinewidth,
+ 		minimum height=3*\database@segmentheight + 2*\database@aspectratio*\database@radius + \pgflinewidth,
+ 	},
+ 	database segment height/.store in=\database@segmentheight,
+ 	database radius/.store in=\database@radius,
+ 	database aspect ratio/.store in=\database@aspectratio,
+ 	database segment height=0.1cm,
+ 	database radius=0.25cm,
+ 	database aspect ratio=0.35,
+ }
+ \makeatother
+ 
+ \tikzset{%
+ 	every neuron/.style={
+ 		circle,
+ 		draw,
+ 		minimum size=.4cm
+ 	},
+ 	neuron 100/.style={
+ 		draw=none, 
+ 		scale=1.3,
+ 		text height=0.333cm,
+ 		execute at begin node=\color{black}$\vdots$
+ 	},
+ }
+ 
+ \tikzset{%
+ 	every neuron2/.style={
+ 		circle,
+ 		draw,
+ 		minimum size=.6cm
+ 	},
+ 	neuron2 100/.style={
+ 		draw=none, 
+ 		scale=1.5,
+ 		text height=0.233cm,
+ 		execute at begin node=\color{black}$\vdots$
+ 	},
+ }
+ 
+ \tikzset{%
+ 	every empty-neuron/.style={
+ 		minimum size=.6cm
+ 	}
+ }
+ 
+ 
+ \begin{document}
+ 	\begin{circuitikz}
+ 		\ctikzset{tripoles/mos style=arrows}
+ 		\ctikzset{transistors/arrow pos=end}
+ 		
+ 		\tikzstyle{every node}=[font={{\Large }}]
+ 		
+ 		\newcommand{\diodecon}[1]{\draw (#1.gate) node[circ]{} |-  (#1.drain) node[circ]{}}
+ 		
+ 		
+ 		\coordinate (start-wcm) at (0,5);
+ 		\coordinate (start-iwcm) at (4,5);
+ 		\coordinate (start-wsccm) at (8,5);
+ 		\coordinate (start-ccm) at (12,5);
+ 		
+ 		\coordinate (start-scm) at (0,0);
+ 		\coordinate (start-dp) at (4.5,0);
+ 		\coordinate (start-ccdp) at (9,0);
+ 		\coordinate (start-ccp) at (14,0);
+ 		
+ 		\coordinate (start-aindt) at (2,-8);
+ 		\coordinate (start-cai) at (6,-8);
+ 		\coordinate (start-cnai) at (10,-8);
+ 		\coordinate (start-cnaidt) at (14,-8);
+ 		
+ 		\coordinate (start-mcp) at (2,-12);
+ 		\coordinate (start-mcp2) at (6,-12);
+ 		\coordinate (start-ds) at (10,-12);
+ 		\coordinate (start-vr2) at (14,-12);
+ 		
+ 		
+ 		\coordinate (start-gcc) at (0,-15);
+ 		\coordinate (start-dt) at (6,-15);
+ 		\coordinate (start-nt) at (10,-15);
+ 		
+ 		%	\node[cloud, draw, inner sep=5cm] (c) at (20,0) {};
+ 		
+ 		
+ 		
+ 		\begin{scope}[shift={(4,-8)}]
+ 			%cm
+ 			\draw (0,0) node[pmos, anchor=source, xscale=-1, color=red](m1){}; % xscale=-1 flipped den Transistor vertikal, yscale horizontal
+ 			\draw (m1.base) node[left=30, text=red]{$M1$};
+ 			\draw (m1.gate) node[circ]{} |- (m1.drain) node[circ]{};
+ 			\draw (0,0) ++(3,0) node[pmos, anchor=source, color=red](m2){};
+ 			\draw (m2.drain) node[left, text=red]{$M2$};
+ 			\draw (m1.gate) -- (m2.gate) node(con1){}; %netBias
+ 			\draw (m1.source) -- (m2.source); %netVdd
+ 			\draw (m1.D) +(0,-.5) to[short, o-, i=$I_{b}$] (m1.D); %Bias current in
+ 			
+ 			\coordinate (P) at ($(m2.D)+(0,-1.2)$);
+ 			
+ 			%dp
+ 			\draw (P) ++(-1.5,-.5) node[pmos, anchor=source, color=black, color=green](m3){};
+ 			\draw (m3.base) node[right=30, text=green]{$M3$};
+ 			\draw (P) ++(+1.5,-.5) node[pmos, anchor=source, xscale=-1, color=green](m4){};
+ 			\draw (m4.base) node[left=30, text=green]{$M4$};
+ 			\draw (m3.source) -- (m4.source);
+% 			\draw (P) to[short, -*] ++(0,-.5); %net1
+ 			\draw[dotted] (m2.D) to[short, -*] ($(P)+(0,-.5)$); %net1
+ 			
+ 			%input connections
+ 			\draw (m3.G) ++(0,0) to[short, o-] (m3.G);
+ 			\draw (m4.G) ++(0,0) to[short, o-] (m4.G);
+ 			\draw (m4.G) ++(.75, 0)  node[](vinm){$V_{in-}$};
+ 			\draw (m3.G) ++(-.75,0)  node[](vinp){$V_{in+}$};	
+ 			
+ 			\draw (m4.D) ++(0,-.7) to[short, *-o] ++(1,0) node[above left=-.3]{$V_{out}$};
+ 			
+ 			\coordinate (Y3) at ($(m3.D)+(0,-1.8)$);
+ 			\coordinate (Y4) at ($(m4.D)+(0,-1.8)$);
+ 			%cml
+ 			\path (0,0) coordinate(lower-transistors-offset);
+ 			\draw (Y3) ++(lower-transistors-offset) node[nmos, anchor=drain, xscale=-1, color=blue](m5){};
+ 			\draw (m5.base) node[left=30, text=blue]{$M5$};
+ 			\draw (Y3) -- (m5.drain);
+ 			\draw (Y4) ++(lower-transistors-offset) node[nmos, anchor=drain, color=blue](m6){};
+ 			\draw (m5.gate) node[circ]{} |- (m5.drain) node[circ]{};%net2
+ 			\draw (m6.base) node[right=30, text=blue]{$M6$};
+ 			\draw (Y4) -- (m6.drain);
+ 			\draw (m5.gate) -- (m6.gate);
+ 			\draw (m5.source) -- (m6.source);
+ 			
+ 			\draw[dotted] (m3.D) to (m5.D);
+ 			\draw[dotted] (m4.D) to (m6.D);
+ 			
+ 			\newcommand\strmargin{.2}
+ 			%	\newcommand\nodeoffset{++()}
+ 			\fill[fill=yellow!80!black, opacity=0.2] (m1.S) ++(-\strmargin, \strmargin) rectangle ($(m2.D)+(1,-\strmargin)$);
+ 			\path (0,0) ++(4.6,-1.6) node[]{scm$_{\color{red}bb}$};
+ 			\fill[fill=yellow!80!black, opacity=0.2] (m3.S) ++(-1, .24) rectangle ($(m4.D)+(1,-.6)$);
+ 			\path (0,0) ++(4,-5.2) node[]{dp$_{\color{green}tt}$};
+ 			\fill[fill=yellow!80!black, opacity=0.2] (m5.S) ++(-.2, -.62) rectangle ($(m6.D)+(.2,.2)$);
+ 			\path (0,0) ++(4,-8.6) node[]{scm$_{\color{blue}ll}$};
+ 			
+% 			\coordinate (legend) at (-.7,-4);
+% 			\draw[thick] (legend) -- ++(.5,.5) node[below right]{{\footnotesize load}};
+% 			\draw[thick, color=red] (legend) ++(0,-.5) -- ++(.5,.5) node[below right]{{\footnotesize bias}};
+% 			\draw[thick, color=green] (legend) ++(0,-1) -- ++(.5,.5) node[below right]{{\footnotesize transc.}};
+ 		\end{scope}
+ 		
+		\begin{scope}[shift={(22,-8)}]
+ 			%cm
+ 			\draw (0,0) node[pmos, anchor=source, xscale=-1, color=red](m1){}; % xscale=-1 flipped den Transistor vertikal, yscale horizontal
+ 			\draw (m1.base) node[left=30, text=red]{$M1$};
+ 			\draw (m1.gate) node[circ]{} |- (m1.drain) node[circ]{};
+ 			\draw (0,0) ++(3,0) node[pmos, anchor=source, color=red](m2){};
+ 			\draw (m2.drain) node[left, text=red]{$M2$};
+ 			\draw (m1.gate) -- (m2.gate) node(con1){}; %netBias
+ 			\draw (m1.source) -- (m2.source); %netVdd
+ 			\draw (m1.D) +(0,-.5) to[short, o-, i=$I_{b}$] (m1.D); %Bias current in
+ 			
+ 			\coordinate (P) at ($(m2.D)+(0,-1.2)$);
+ 			
+ 			%dp
+ 			\draw (P) ++(-1.5,-.5) node[pmos, anchor=source, color=black, color=green](m3){};
+ 			\draw (m3.base) node[right=30, text=green]{$M3$};
+ 			\draw (P) ++(+1.5,-.5) node[pmos, anchor=source, xscale=-1, color=green](m4){};
+ 			\draw (m4.base) node[left=30, text=green]{$M4$};
+ 			\draw (m3.source) -- (m4.source);
+% 			\draw (P) to[short, -*] ++(0,-.5); %net1
+ 			\draw[dotted] (m2.D) to[short, -*] ($(P)+(0,-.5)$); %net1
+ 			
+ 			%input connections
+ 			\draw (m3.G) ++(0,0) to[short, o-] (m3.G);
+ 			\draw (m4.G) ++(0,0) to[short, o-] (m4.G);
+ 			\draw (m4.G) ++(.75, 0)  node[](vinm){$V_{in-}$};
+ 			\draw (m3.G) ++(-.75,0)  node[](vinp){$V_{in+}$};	
+ 			
+ 			\draw (m4.D) ++(0,-.7) to[short, *-o] ++(1,0) node[above left=-.3]{$V_{out}$};
+ 			
+ 			\coordinate (Y3) at ($(m3.D)+(0,-1.8)$);
+ 			\coordinate (Y4) at ($(m4.D)+(0,-1.8)$);
+ 			%cml
+ 			\path (0,0) coordinate(lower-transistors-offset);
+ 			\draw (Y3) ++(lower-transistors-offset) node[nmos, anchor=drain, xscale=-1, color=blue](m5){};
+ 			\draw (m5.base) node[left=30, text=blue]{$M5$};
+ 			\draw (Y3) -- (m5.drain);
+ 			\draw (Y4) ++(lower-transistors-offset) node[nmos, anchor=drain, color=blue](m6){};
+ 			\draw (m5.gate) node[circ]{} |- (m5.drain) node[circ]{};%net2
+ 			\draw (m6.base) node[right=30, text=blue]{$M6$};
+ 			\draw (Y4) -- (m6.drain);
+ 			\draw (m5.gate) -- (m6.gate);
+ 			\draw (m5.source) -- (m6.source);
+ 			
+ 			\draw[dotted] (m3.D) to (m5.D);
+ 			\draw[dotted] (m4.D) to (m6.D);
+ 			
+ 			\newcommand\strmargin{.2}
+ 			%	\newcommand\nodeoffset{++()}
+ 			\fill[fill=yellow!80!black, opacity=0.2] (m1.S) ++(-\strmargin, \strmargin) rectangle ($(m2.D)+(1,-\strmargin)$);
+ 			\path (0,0) ++(4.6,-1.6) node[]{scm$_{\color{red}bb}$};
+ 			\fill[fill=yellow!80!black, opacity=0.2] (m3.S) ++(-1, .24) rectangle ($(m4.D)+(1,-.6)$);
+ 			\path (0,0) ++(4,-5.2) node[]{dp$_{\color{green}tt}$};
+ 			\fill[fill=yellow!80!black, opacity=0.2] (m5.S) ++(-.2, -.62) rectangle ($(m6.D)+(.2,.2)$);
+ 			\path (0,0) ++(4,-8.6) node[]{scm$_{\color{blue}ll}$};;
+ 			
+% 			\coordinate (legend) at (-.7,-4);
+% 			\draw[thick] (legend) -- ++(.5,.5) node[below right]{{\footnotesize load}};
+% 			\draw[thick, color=red] (legend) ++(0,-.5) -- ++(.5,.5) node[below right]{{\footnotesize bias}};
+% 			\draw[thick, color=green] (legend) ++(0,-1) -- ++(.5,.5) node[below right]{{\footnotesize transc.}};
+ 		\end{scope}
+ 		
+ 		
+% 		\draw [-latex, line width=5mm](9,-3) -- node[above]{training} (13,-3);
+% 		
+% 		\begin{scope}[shift={(15,-2)}, scale=1]
+% 			\foreach \m/\l [count=\y] in {1,2,100,3,4}
+% 			{
+% 				\node [every neuron2/.try, neuron2 \m/.try] (input1-\m) at (0,2-\y) {};
+% 				%	  		\node[every empty-neuron/.try, empty-neuron \m/.try] at (4.6,1.75-\y) {$\frac{W_\y}{L_\y}$};
+% 				%	  		\ifthenelse{\y=3}{\node[] at (4.6,1.75-\y) {$\frac{W_\y}{L_\y}$};}{}
+% 				%	  		\ifnumequal{\y}{3}{}{\node[anchor=west] at (-1.5,2-\y) {$y_{\m}$};}
+% 			}
+% 			\foreach \m/\l [count=\y] in {1,2,100,K-1,K}
+% 			{
+% 				\ifnumequal{\y}{3}{}{\node[anchor=west] at (-1.5,2-\y) {$y_{\m}$};}
+% 			}
+% 			
+% 			\foreach \m [count=\y] in {1, 2,3, 100,4,5,6}
+% 			{
+% 				\node [every neuron2/.try, neuron2 \m/.try ] (hidden1-\m) at (2,3-\y) {};
+% 			}
+% 			
+% 			\foreach \m [count=\y] in {1,2,3,4,5,6}
+% 			{
+% 				\node [every neuron2/.try, neuron \m/.try ] (output1-\m) at (4,2.5-\y) {};
+% 				\node[] at (4.6,2.5-\y) {$\frac{W_\y}{L_\y}$};
+% 			}
+% 			
+% 			\foreach \i in {1,...,4}
+% 			\foreach \j in {1,...,6}
+% 			\draw [->] (input1-\i) -- (hidden1-\j);
+% 			
+% 			\foreach \i in {1,...,6}
+% 			\foreach \j in {1,...,6}
+% 			\draw [->] (hidden1-\i) -- (output1-\j);
+% 			
+% 		\end{scope}
+% 		\draw [line width=1.5mm, color=red] (0, 0) -- (20, -6);
+% 		\draw [line width=1.5mm, color=red] (0, -6) -- (20, 0);
+% 		\draw [-latex, line width=3mm, red](10,-6) -- (10,-7.5);
+ 		
+% 		\path (-.5,-7.5) node[align=left]{{\small struct.:}};
+% 		\path (.6,-7.5) node[align=left]{{\small func.:}};
+% 		\draw (.05, -7.3) -- (.05, -17);
+%\path (-.5,-7.5) node[align=left]{{ structure$_\text{function}$}:};
+%
+%	\path (-1,-8.6) node[align=left, anchor=west]{scm$_{\color{red}bb}$};
+%	\path (-.7,-11.6) node[align=left, anchor=west]{dp$_{\color{green}tt}$};
+%	%	\path (.85,-11.6) node[align=left]{{\color{green} transc.}};
+%	
+%	\path (-1,-15.6) node[align=left, anchor=west]{scm$_{\color{blue}ll}$};
+	%	\path (.55,-15.6) node[align=left]{{\color{black} load}};
+ 		
+% 		\path (-1,-8.6) node[align=left, anchor=west]{scm {\color{red} bias}};
+% 		%	\path (.52,-8.6) node[align=left]{{\color{red} bias}};
+% 		
+% 		\path (-.7,-11.6) node[align=left, anchor=west]{dp {\color{green} transc.}};
+% 		%	\path (.85,-11.6) node[align=left]{{\color{green} transc.}};
+% 		
+% 		\path (-1,-15.6) node[align=left, anchor=west]{scm  {\color{black} load}};
+% 		%	\path (.55,-15.6) node[align=left]{{\color{black} load}};
+ 		
+ 		\node[anchor=west] at (14.4,-7) {$\bm{y} \hspace{1.2cm} \rightarrow \hspace{1.2cm} \bm{x}$ };
+ 		\node[anchor=west, align=left] at (11.3,-7) {\textbf{circuit} \\ \textbf{performance}};
+ 		\node[anchor=west, align=left] at (18.5,-7) {\textbf{device} \\ \textbf{size}};
+ 		
+ 		\node[anchor=west, align=left] at (4,-7) {\textbf{training} \\ \textbf{samples}};
+ 		\node[anchor=west, align=left] at (24,-7) {\textbf{test} \\ \textbf{samples}};
+ 		
+ 		\begin{scope}[shift={(2.5,-8)}]
+% 			\begin{scope}[]
+% 				%			\path (0,0) ++(-2,-1) node[align=left]{scm,\\{\color{red} bias}};
+% 				%cm
+% 				\draw (0,0) node[pmos, anchor=source, xscale=-1, color=red](m1){}; % xscale=-1 flipped den Transistor vertikal, yscale horizontal
+% 				\draw (m1.base) node[left=30, text=red]{$M1$};
+% 				\draw (m1.gate) node[circ]{} |- (m1.drain) node[circ]{};
+% 				\draw (0,0) ++(3,0) node[pmos, anchor=source, color=red](m2){};
+% 				\draw (m2.drain) node[left, text=red]{$M2$};
+% 				\draw (m1.gate) -- (m2.gate) node(con1){}; %netBias
+% 				\draw (m1.source) -- (m2.source); %netVdd
+% 			\end{scope}
+% 			\fill[fill=yellow!80!black, opacity=0.2] (m1.S) ++(-.2, .2) rectangle ($(m2.D)+(.2,-.2)$);
+ 			
+% 			\draw [-latex, line width=3mm](6,-1) -- node[above]{training} (10,-1);
+ 			\begin{scope}[shift={(13,-.5)}, scale=.6]
+ 				\foreach \m/\l [count=\y] in {1,2,100,3,4}
+ 				{
+ 					\node [every neuron/.try, neuron \m/.try] (input-\m) at (0,2.5-\y) {};
+ 					%		  		\ifnumequal{\m}{100}{}{\node[] at (-.7,2.5-\y) {{\normalsize $\phi_\m$}};}
+ 				}
+ 				\foreach \m/\l [count=\y] in {1,2,100,K-1,K}
+ 				{
+ 					\ifnumequal{\y}{3}{}{\node[anchor=west] at (-1.8,2.5-\y) {{\normalsize $y_{\m}$}};}
+ 				}
+ 				
+ 				\foreach \m [count=\y] in {1, 2, 100,3,4}
+ 				{
+ 					\node [every neuron/.try, neuron \m/.try ] (hidden-\m) at (2,2.5-\y) {};
+ 				}
+ 				
+ 				\foreach \m [count=\y] in {1,2}
+ 				{
+ 					\node [every neuron/.try, neuron \m/.try ] (output-\m) at (4,1-\y) {};
+ 					\node[] at (4.7,1-\y) {{\footnotesize $\frac{W_\y}{L_\y}$}};
+ 				}
+ 				
+ 				\foreach \i in {1,...,4}
+ 				\foreach \j in {1,...,4}
+ 				\draw [->] (input-\i) -- (hidden-\j);
+ 				
+ 				\foreach \i in {1,...,4}
+ 				\foreach \j in {1,...,2}
+ 				\draw [->] (hidden-\i) -- (output-\j);
+ 				
+ 				\draw (1,-2.8) node[below, text width=4.5cm, align=center]{scm$_{{\color{red}bb}}$};
+ 			\end{scope}
+ 			
+ 			
+ 		\end{scope}
+ 		\begin{scope}[shift={(2.5,-11)}]
+% 			\begin{scope}[]
+% 				%		\path (0,0) ++(-2,-1) node[align=left]{dp,\\{\color{green}transc.}};
+% 				%dp
+% 				\draw (1.5,0) ++(-1.5,-.5) node[pmos, anchor=source, color=green](m3){};
+% 				\draw (m3.base) node[right=30, text=green]{$M3$};
+% 				\draw (1.5,0) ++(+1.5,-.5) node[pmos, anchor=source, xscale=-1, color=green](m4){};
+% 				\draw (m4.base) node[left=30, text=green]{$M4$};
+% 				\draw (m3.source) -- (m4.source);
+% 			\end{scope}
+% 			\fill[fill=yellow!80!black, opacity=0.2] (m3.S) ++(-1, .2) rectangle ($(m4.D)+(1,-.2)$);
+ 			
+ 			\draw [-latex, line width=3mm](9,-1.25) -- node[above]{fine-tune} (11,-1.25);
+ 			\draw [-latex, line width=3mm](16.5,-1.25) -- node[above]{evaluate} (18.5,-1.25);
+ 			\begin{scope}[shift={(13,-.9)}, scale=.6]
+ 				\foreach \m/\l [count=\y] in {1,2,100,3,4}
+ 				{
+ 					\node [every neuron/.try, neuron \m/.try] (input-\m) at (0,2.5-\y) {};
+ 					%		  		\ifnumequal{\m}{100}{}{\node[] at (-.7,2.5-\y) {{\normalsize $\phi_\m$}};}
+ 				}
+ 				\foreach \m/\l [count=\y] in {1,2,100,K-1,K}
+ 				{
+ 					\ifnumequal{\y}{3}{}{\node[anchor=west] at (-1.8,2.5-\y) {{\normalsize $y_{\m}$}};}
+ 				}
+ 				
+ 				\foreach \m [count=\y] in {1, 2, 100,3,4}
+ 				{
+ 					\node [every neuron/.try, neuron \m/.try ] (hidden-\m) at (2,2.5-\y) {};
+ 				}
+ 				
+ 				\foreach \m [count=\y] in {3,4}
+ 				{
+ 					\node [every neuron/.try, neuron \m/.try ] (output-\y) at (4,1-\y) {};
+ 					\node[] at (4.7,1-\y) {{\footnotesize $\frac{W_\m}{L_\m}$}};
+ 				}
+ 				
+ 				\foreach \i in {1,...,4}
+ 				\foreach \j in {1,...,4}
+ 				\draw [->] (input-\i) -- (hidden-\j);
+ 				
+ 				\foreach \i in {1,...,4}
+ 				\foreach \j in {1,...,2}
+ 				\draw [->] (hidden-\i) -- (output-\j);
+ 				
+ 				\draw (1,-2.5) node[below, text width=4.5cm, align=center]{dp$_{{\color{green}tt}}$};
+ 			\end{scope}
+ 		\end{scope}
+ 		
+ 		\begin{scope}[shift={(2.5,-14)}]
+% 			%		\path (0,0) ++(-2,-1.7) node[align=left]{scm,\\load};
+% 			%cml
+% 			\draw (0,0) ++(0,-1) node[nmos, anchor=drain, xscale=-1, color=blue](m5){};
+% 			\draw (m5.base) node[left=30, text=blue]{$M5$};
+% 			%		\draw (0,0) -- (m5.drain);
+% 			\draw (3,0) ++(0,-1) node[nmos, anchor=drain, color=blue](m6){};
+% 			\draw (m5.gate) node[circ]{} |- (m5.drain) node[circ]{};%net2
+% 			\draw (m6.base) node[right=30, text=blue]{$M6$};
+% 			%		\draw (3.5,0) -- (m6.drain);
+% 			\draw (m5.gate) -- (m6.gate);
+% 			\draw (m5.source) -- (m6.source);
+% 			
+% 			\draw [-latex, line width=3mm](6,-1.5) -- node[above]{training} (10,-1.5);
+% 			\fill[fill=yellow!80!black, opacity=0.2] (m5.S) ++(-.2, -.2) rectangle ($(m6.D)+(.2,.2)$);
+ 			
+ 			\begin{scope}[shift={(13,-1.2)}, scale=.6]
+ 				\foreach \m/\l [count=\y] in {1,2,100,3,4}
+ 				{
+ 					\node [every neuron/.try, neuron \m/.try] (input-\m) at (0,2.5-\y) {};
+ 					%		  		\ifnumequal{\m}{100}{}{\node[] at (-.7,2.5-\y) {{\normalsize $\phi_\m$}};}
+ 				}
+ 				\foreach \m/\l [count=\y] in {1,2,100,K-1,K}
+ 				{
+ 					\ifnumequal{\y}{3}{}{\node[anchor=west] at (-1.8,2.5-\y) {{\normalsize $y_{\m}$}};}
+ 				}
+ 				
+ 				\foreach \m [count=\y] in {1, 2, 100,3,4}
+ 				{
+ 					\node [every neuron/.try, neuron \m/.try ] (hidden-\m) at (2,2.5-\y) {};
+ 				}
+ 				
+ 				\foreach \m [count=\y] in {5,6}
+ 				{
+ 					\node [every neuron/.try, neuron \m/.try ] (output-\y) at (4,1-\y) {};
+ 					\node[] at (4.7,1-\y) {{\footnotesize $\frac{W_\m}{L_\m}$}};
+ 				}
+ 				
+ 				\foreach \i in {1,...,4}
+ 				\foreach \j in {1,...,4}
+ 				\draw [->] (input-\i) -- (hidden-\j);
+ 				
+ 				\foreach \i in {1,...,4}
+ 				\foreach \j in {1,...,2}
+ 				\draw [->] (hidden-\i) -- (output-\j);
+ 				
+ 				\draw (1,-2.8) node[below, text width=4.5cm, align=center]{scm$_{{\color{blue}ll}}$};
+ 			\end{scope}
+ 			
+ 		\end{scope}
+% 		\draw [dashed, line width=1.5mm, color=red] (2, -17.5) -- (18, -17.5);
+% 		\begin{scope}[shift={(5,-20)}, scale=.6, color=red]
+% 			\foreach \m/\l [count=\y] in {1,2,100,3,4}
+% 			{
+% 				\node [every neuron/.try, neuron \m/.try] (input-\m) at (0,2.5-\y) {};
+% 				%	  		\ifnumequal{\m}{100}{}{\node[] at (-.7,2.5-\y) {{\normalsize $\phi_\m$}};}
+% 			}
+% 			\foreach \m/\l [count=\y] in {1,2,100,K-1,K}
+% 			{
+% 				\ifnumequal{\y}{3}{}{\node[anchor=west] at (-1.8,2.5-\y) {{\normalsize $y_{\m}$}};}
+% 			}
+% 			
+% 			\foreach \m [count=\y] in {1, 2, 100,3,4}
+% 			{
+% 				\node [every neuron/.try, neuron \m/.try ] (hidden-\m) at (2,2.5-\y) {};
+% 			}
+% 			
+% 			\foreach \m [count=\y] in {5,6}
+% 			{
+% 				\node [every neuron/.try, neuron \m/.try ] (output-\y) at (4,1-\y) {};
+% 				\node[] at (4.7,1-\y) {{\footnotesize $\frac{W_i}{L_i}$}};
+% 			}
+% 			
+% 			\foreach \i in {1,...,4}
+% 			\foreach \j in {1,...,4}
+% 			\draw [->] (input-\i) -- (hidden-\j);
+% 			
+% 			\foreach \i in {1,...,4}
+% 			\foreach \j in {1,...,2}
+% 			\draw [->] (hidden-\i) -- (output-\j);
+% 			
+% 			\path (2,-3.2) node[align=left]{{\color{black}scm,} bias};
+% 			
+% 		\end{scope}
+% 		%	\draw[] (10,-20) .. controls (11,-19) .. (12, -15) .. controls(11, -14);
+% 		\draw[dashed] (5.5,-19).. controls (7.5,-15) and (5.5, -10) .. (10, -9);
+% 		\draw[dashed] (10.5,-19).. controls (10,-18) and (7, -19).. (7, -16) .. controls (7,-13) .. (10, -12.2);
+% 		\draw[dashed] (15.5,-19).. controls (15.5,-18) and (7, -19).. (10, -15.5);
+% 		\node[cloud, cloud puffs=25, draw, minimum width=17cm, minimum height=6cm] (c) at (11,-20.5) {};
+% 		\path (10, -22.5) node[align=left]{database};
+ 		
+% 		\begin{scope}[shift={(10,-20)}, scale=.6, color=green]
+% 			\foreach \m/\l [count=\y] in {1,2,100,3,4}
+% 			{
+% 				\node [every neuron/.try, neuron \m/.try] (input-\m) at (0,2.5-\y) {};
+% 				%	  		\ifnumequal{\m}{100}{}{\node[] at (-.7,2.5-\y) {{\normalsize $\phi_\m$}};}
+% 			}
+% 			\foreach \m/\l [count=\y] in {1,2,100,K-1,K}
+% 			{
+% 				\ifnumequal{\y}{3}{}{\node[anchor=west] at (-1.8,2.5-\y) {{\normalsize $y_{\m}$}};}
+% 			}
+% 			
+% 			\foreach \m [count=\y] in {1, 2, 100,3,4}
+% 			{
+% 				\node [every neuron/.try, neuron \m/.try ] (hidden-\m) at (2,2.5-\y) {};
+% 			}
+% 			
+% 			\foreach \m [count=\y] in {5,6}
+% 			{
+% 				\node [every neuron/.try, neuron \m/.try ] (output-\y) at (4,1-\y) {};
+% 				\node[] at (4.7,1-\y) {{\footnotesize $\frac{W_i}{L_i}$}};
+% 			}
+% 			
+% 			\foreach \i in {1,...,4}
+% 			\foreach \j in {1,...,4}
+% 			\draw [->] (input-\i) -- (hidden-\j);
+% 			
+% 			\foreach \i in {1,...,4}
+% 			\foreach \j in {1,...,2}
+% 			\draw [->] (hidden-\i) -- (output-\j);
+% 			
+% 			\path (2,-3.2) node[align=left]{{\color{black}dp,} transc.};
+% 			
+% 		\end{scope}
+% 		\begin{scope}[shift={(15,-20)}, scale=.6, color=blue]
+% 			\foreach \m/\l [count=\y] in {1,2,100,3,4}
+% 			{
+% 				\node [every neuron/.try, neuron \m/.try] (input-\m) at (0,2.5-\y) {};
+% 				%	  		\ifnumequal{\m}{100}{}{\node[] at (-.7,2.5-\y) {{\normalsize $\phi_\m$}};}
+% 			}
+% 			\foreach \m/\l [count=\y] in {1,2,100,K-1,K}
+% 			{
+% 				\ifnumequal{\y}{3}{}{\node[anchor=west] at (-1.8,2.5-\y) {{\normalsize $y_{\m}$}};}
+% 			}
+% 			
+% 			\foreach \m [count=\y] in {1, 2, 100,3,4}
+% 			{
+% 				\node [every neuron/.try, neuron \m/.try ] (hidden-\m) at (2,2.5-\y) {};
+% 			}
+% 			
+% 			\foreach \m [count=\y] in {5,6}
+% 			{
+% 				\node [every neuron/.try, neuron \m/.try ] (output-\y) at (4,1-\y) {};
+% 				\node[] at (4.7,1-\y) {{\footnotesize $\frac{W_i}{L_i}$}};
+% 			}
+% 			
+% 			\foreach \i in {1,...,4}
+% 			\foreach \j in {1,...,4}
+% 			\draw [->] (input-\i) -- (hidden-\j);
+% 			
+% 			\foreach \i in {1,...,4}
+% 			\foreach \j in {1,...,2}
+% 			\draw [->] (hidden-\i) -- (output-\j);
+% 			
+% 			\path (2,-3.2) node[align=left]{{\color{black}scm}, load};
+% 			
+% 		\end{scope}
+ 		
+ 		
+ 		
+ 		
+ 	\end{circuitikz}
+ \end{document}

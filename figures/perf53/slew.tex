@@ -1,0 +1,32 @@
+\documentclass[tikz]{standalone}
+\usepackage{pgfplots}
+%\pgfplotsset{width=7cm,compat=1.18}
+\usepgfplotslibrary{statistics}
+\def\axisdefaultwidth{6cm}
+\def\axisdefaultheight{6cm}
+%\pgfplotsset{every axis/.style={scale only axis}} 		
+
+\begin{document}
+\begin{tikzpicture}
+%\begin{axis}[small,ymin=0,title=\texttt{slew}]
+\begin{axis}[small,ymin=0]
+\addplot [
+ybar,
+fill=blue!75,
+draw=blue]
+table [x=perf, y=cnt] {
+cnt                 perf                
+91.00000            2.70728             
+144.00000           10.89264            
+155.00000           19.07800            
+173.00000           27.26337            
+136.00000           35.44873            
+99.00000            43.63409            
+112.00000           51.81945            
+107.00000           60.00481            
+90.00000            68.19018            
+51.00000            76.37554            
+};
+\end{axis}
+\end{tikzpicture}
+\end{document}

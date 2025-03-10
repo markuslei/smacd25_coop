@@ -1,0 +1,32 @@
+\documentclass[tikz]{standalone}
+\usepackage{pgfplots}
+%\pgfplotsset{width=7cm,compat=1.18}
+\usepgfplotslibrary{statistics}
+\def\axisdefaultwidth{6cm}
+\def\axisdefaultheight{6cm}
+%\pgfplotsset{every axis/.style={scale only axis}} 		
+
+\begin{document}
+\begin{tikzpicture}
+%\begin{axis}[small,ymin=0,title=\texttt{phase}]
+\begin{axis}[small,ymin=0]
+\addplot [
+ybar,
+fill=blue!75,
+draw=blue]
+table [x=perf, y=cnt] {
+cnt                 perf                
+123.00000           69.32800            
+150.00000           71.27605            
+190.00000           73.22410            
+138.00000           75.17215            
+168.00000           77.12020            
+60.00000            79.06825            
+100.00000           81.01630            
+106.00000           82.96435            
+62.00000            84.91240            
+61.00000            86.86045            
+};
+\end{axis}
+\end{tikzpicture}
+\end{document}

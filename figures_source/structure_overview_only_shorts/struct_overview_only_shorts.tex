@@ -1,0 +1,199 @@
+%\documentclass[tikz, border=20]{standalone}
+%\documentclass[tikz]{standalone}
+%\documentclass[border=1mm]{standalone}
+\documentclass[]{standalone}
+\usepackage{tikz}
+\usepackage[siunitx]{circuitikz} % Loading circuitikz with siunitx option
+\usetikzlibrary{calc}
+
+
+\begin{document}
+	\begin{circuitikz}
+		\ctikzset{tripoles/mos style=arrows}
+		\ctikzset{transistors/arrow pos=end}
+		
+\tikzstyle{every node}=[font={{\Large }}]
+
+	\newcommand{\diodecon}[1]{\draw (#1.gate) node[circ]{} |-  (#1.drain) node[circ]{}}
+
+	
+	\coordinate (start-wcm) at (0,5);
+	\coordinate (start-iwcm) at (4,5);
+	\coordinate (start-wsccm) at (8,5);
+	\coordinate (start-ccm) at (12,5);
+	
+	\coordinate (start-scm) at (0,0);
+	\coordinate (start-dp) at (4.5,0);
+	\coordinate (start-ccdp) at (9,0);
+	\coordinate (start-ccp) at (14,0);
+	
+	\coordinate (start-aindt) at (2,-8);
+	\coordinate (start-cai) at (6,-8);
+	\coordinate (start-cnai) at (10,-8);
+	\coordinate (start-cnaidt) at (14,-8);
+	
+	\coordinate (start-mcp) at (2,-12);
+	\coordinate (start-mcp2) at (6,-12);
+	\coordinate (start-ds) at (10,-12);
+	\coordinate (start-vr2) at (14,-12);
+	
+	
+	\coordinate (start-gcc) at (0,-15);
+	\coordinate (start-dt) at (6,-15);
+	\coordinate (start-nt) at (10,-15);
+	
+	
+	
+	%iwcm
+	\draw (start-iwcm) node[nmos, anchor=source, xscale=-1](m1-iwcm){};
+	\draw (start-iwcm) ++(3,0) node[nmos, anchor=source](m2-iwcm){};
+	\draw (m1-iwcm.D) node[nmos, anchor=source, xscale=-1](m3-iwcm){};
+	\draw (m2-iwcm.D) node[nmos, anchor=source](m4-iwcm){};
+	\diodecon{m1-iwcm};
+	\diodecon{m4-iwcm};
+	\draw (m1-iwcm.source) -- (m2-iwcm.source) ;
+	\draw (m1-iwcm.gate) -- (m2-iwcm.gate);
+	\draw (m1-iwcm.drain) -- (m3-iwcm.source);
+	\draw (m3-iwcm.gate) -- (m4-iwcm.gate);
+	\draw (m2-iwcm.drain) -- (m4-iwcm.source);
+	\draw (start-iwcm) ++(1.5,0) node[below, text width=4.5cm, align=center]{iwcm};
+	
+	%wcm
+	\draw (start-wcm) node[nmos, anchor=source, xscale=-1](m1-wcm){};
+	\draw (start-wcm) ++(3,0) node[nmos, anchor=source](m2-wcm){};
+	\draw (m2-wcm.D) node[nmos, anchor=source](m4-wcm){};
+	\diodecon{m2-wcm};
+	\draw (m1-wcm.source) -- (m2-wcm.source) ;
+	\draw (m1-wcm.gate) -- (m2-wcm.gate);
+	\draw (m2-wcm.drain) -- (m4-wcm.source);
+	\draw (m4-wcm.G) -- ($(m4-wcm.G)-(2,0)$) node[circ]{};
+	\draw (m1-wcm.D) -- ++(0,1.5);
+	\draw (start-wcm) ++(1.5,0) node[below, text width=4.5cm, align=center]{wcm};
+	
+	%scm
+	\draw (start-scm)node[nmos, anchor=source, xscale=-1](m1-scm){};
+	\diodecon{m1-scm};
+	\draw (start-scm) ++(3,0) node[nmos, anchor=source](m2-scm){};
+	\draw (m1-scm.source) -- (m2-scm.source);
+	\draw (m1-scm.gate) -- (m2-scm.gate);
+	\draw (start-scm) ++(1.5,0) node[below, text width=4.5cm, align=center]{scm};
+	
+	%dp
+	\draw (start-dp) node[nmos, anchor=source](m1-dp){};
+	\draw (start-dp) ++(2,0) node[nmos, anchor=source, xscale=-1](m2-dp){};
+	\draw (m1-dp.S) -- (m2-dp.S);
+	\draw (start-dp) ++(1,0) node[below, text width=4.5cm, align=center]{dp};
+	
+	%ccdp
+	\draw (start-ccdp) node[nmos, anchor=source](m1-ccdp){};
+	\draw (start-ccdp) ++(2,0) node[nmos, anchor=source, xscale=-1](m2-ccdp){};
+	\draw (m1-ccdp.D) node[nmos, anchor=source](m3-ccdp){};
+	\draw (m2-ccdp.D) node[nmos, anchor=source](m4-ccdp){};
+	\draw (m1-ccdp.S) -- (m2-ccdp.S);
+	\draw (m3-ccdp.G) -- (m4-ccdp.G);
+	\draw (start-ccdp) ++(1,0) node[below, text width=4.5cm, align=center]{ccdp};
+	
+	%wsccm
+	\draw (start-wsccm) node[nmos, anchor=source, xscale=-1](m1-wsccm){};
+	\draw (start-wsccm) ++(3,0) node[nmos, anchor=source, xscale=1](m2-wsccm){};
+	\draw (m1-wsccm.D) node[nmos, anchor=source, xscale=1](m3-wsccm){};
+	\draw (m2-wsccm.D) node[nmos, anchor=source, xscale=1](m4-wsccm){};
+	\draw (m1-wsccm.S) -- (m2-wsccm.S);
+	\draw (m1-wsccm.G) -- (m2-wsccm.G);
+	\draw (m1-wsccm.G) node[circ]{} |- (m3-wsccm.D)node[circ]{};
+	\draw (m4-wsccm.G) -- (m3-wsccm.G);
+	\draw (start-wsccm) ++(1.5,0) node[below, text width=4.5cm, align=center]{wsccm};
+	
+	%ccm
+	\draw (start-ccm) node[nmos, anchor=source, xscale=-1](m1-ccm){};
+	\draw (start-ccm) ++(3,0) node[nmos, anchor=source](m2-ccm){};
+	\draw (m1-ccm.D) node[nmos, anchor=source, xscale=-1](m3-ccm){};
+	\draw (m2-ccm.D) node[nmos, anchor=source](m4-ccm){};
+	\diodecon{m3-ccm};
+	\diodecon{m1-ccm};
+	\draw (m1-ccm.source) -- (m2-ccm.source) ;
+	\draw (m1-ccm.gate) -- (m2-ccm.gate);
+	\draw (m1-ccm.drain) -- (m3-ccm.source);
+	\draw (m3-ccm.gate) -- (m4-ccm.gate);
+	\draw (m2-ccm.drain) -- (m4-ccm.source);
+	\draw (start-ccm) ++(1.5,0) node[below, text width=4.5cm, align=center]{ccm};
+	
+	%aindt
+	\draw (start-aindt) node[nmos, anchor=source, xscale=-1](m1-aindt){};
+	\draw (m1-aindt.D) node[nmos, anchor=source, xscale=-1](m2-aindt){};
+	\draw (m2-aindt.D) node[pmos, anchor=drain, xscale=-1](m3-aindt){};
+	\draw (m3-aindt.S) node[pmos, anchor=drain, xscale=-1](m4-aindt){};
+	\diodecon{m1-aindt};
+	\draw (start-aindt) ++(0,0) node[below, text width=4.5cm, align=center]{caindt};
+	
+	%aindt
+	\draw (start-cai) node[nmos, anchor=source, xscale=-1](m1-cai){};
+	\draw (m1-cai.D) node[nmos, anchor=source, xscale=-1](m2-cai){};
+	\draw (m2-cai.D) node[pmos, anchor=drain, xscale=-1](m3-cai){};
+	\draw (m3-cai.S) node[pmos, anchor=drain, xscale=-1](m4-cai){};
+	\draw (start-cai) ++(0,0) node[below, text width=4.5cm, align=center]{cai};
+	
+	%cnai
+	\draw (start-cnai) node[nmos, anchor=source, xscale=-1](m1-cnai){};
+	\draw (m1-cnai.D) node[nmos, anchor=source, xscale=-1](m2-cnai){};
+	\draw (m2-cnai.D) node[pmos, anchor=drain, xscale=-1](m3-cnai){};
+	\draw (start-cnai) ++(0,0) node[below, text width=4.5cm, align=center]{cnai};
+	
+	%cnaidt
+	\draw (start-cnaidt) node[nmos, anchor=source, xscale=-1](m1-cnaidt){};
+	\draw (m1-cnaidt.D) node[nmos, anchor=source, xscale=-1](m2-cnaidt){};
+	\draw (m2-cnaidt.D) node[pmos, anchor=drain, xscale=-1](m3-cnaidt){};
+	\diodecon{m1-cnaidt};
+	\draw (start-cnaidt) ++(0,0) node[below, text width=4.5cm, align=center]{cnaidt};
+	
+	%mcp
+	\draw (start-mcp) node[nmos, anchor=source, xscale=-1](m1-mcp){};
+	\draw (m1-mcp.D) node[nmos, anchor=source, xscale=-1](m2-mcp){};
+	\diodecon{m1-mcp};
+	\draw (start-mcp) ++(0,0) node[below, text width=4.5cm, align=center]{mcp1};
+	
+	%mcp
+	\draw (start-mcp2) node[nmos, anchor=source, xscale=-1](m1-mcp2){};
+	\draw (m1-mcp2.D) node[nmos, anchor=source, xscale=-1](m2-mcp2){};
+	\diodecon{m2-mcp2};
+	\draw (start-mcp2) ++(0,0) node[below, text width=4.5cm, align=center]{mcp2};
+	
+	%mcp
+	\draw (start-ccp) node[nmos, anchor=source, xscale=-1](m1-ccp){};
+	\draw (m1-ccp.D) node[nmos, anchor=source, xscale=-1](m2-ccp){};
+	\draw (start-ccp) ++(0,0) node[below, text width=4.5cm, align=center]{ccp};
+	
+	%gcc
+	\draw (start-gcc) node[nmos, anchor=source, xscale=-1](m1-gcc){};
+	\draw (start-gcc) ++(3,0) node[nmos, anchor=source](m2-gcc){};
+	\draw (m1-gcc.G) -- (m2-gcc.G);
+	\draw (start-gcc) ++(1.5,0) node[below, text width=4.5cm, align=center]{gcc};
+		
+	%dt
+	\draw (start-dt)node[nmos, anchor=source, xscale=-1](m1-dt){};
+	\diodecon{m1-dt};
+	\draw (start-dt) ++(0,0) node[below, text width=4.5cm, align=center]{dt};
+	
+	%nt
+	\draw (start-nt)node[nmos, anchor=source, xscale=-1](m1-nt){};
+	\draw (start-nt) ++(0,0) node[below, text width=4.5cm, align=center]{nt};
+	
+	
+	%ds
+	\draw (start-ds)node[nmos, anchor=source, xscale=-1](m1-ds){};
+	\draw (m1-ds.D)node[nmos, anchor=source, xscale=-1](m2-ds){};
+	\diodecon{m1-ds};
+	\diodecon{m2-ds};
+	\draw (start-ds) ++(0,0) node[below, text width=4.5cm, align=center]{ds};
+	
+	%vr2
+	\draw (start-vr2) node[nmos, anchor=source, xscale=1](m1-vr2){};
+	\draw (m1-vr2.D) node[nmos, anchor=source, xscale=1](m2-vr2){};
+	\draw (m1-vr2.G) node[circ]{} |- (m2-vr2.D)node[circ]{};
+	\draw (m2-vr2.G) -- ++(-.2,0);
+	\draw (start-vr2) ++(0,0) node[below, text width=4.5cm, align=center]{vr2};
+	
+
+
+	\end{circuitikz}
+\end{document}

@@ -1,0 +1,9 @@
+*.bbl
+*.aux
+*.cut
+*.blg
+*.log
+*.put
+*.gz
+*.out
+*_old.tex

@@ -1,0 +1,515 @@
+%\documentclass[tikz, border=20]{standalone}
+%\documentclass[tikz]{standalone}
+%\documentclass[border=1mm]{standalone}
+\documentclass[]{standalone}
+\usepackage{tikz}
+\usepackage[siunitx]{circuitikz} % Loading circuitikz with siunitx option
+\usetikzlibrary{calc}
+ \usetikzlibrary{shapes.symbols}
+ \usepackage{etoolbox}
+ \usepackage{xcolor}
+ \usepackage{bm}
+
+
+ \tikzset{%
+ 	every neuron/.style={
+ 		circle,
+ 		draw,
+ 		minimum size=.4cm
+ 	},
+ 	neuron 100/.style={
+ 		draw=none, 
+ 		scale=1.3,
+ 		text height=0.333cm,
+ 		execute at begin node=\color{black}$\vdots$
+ 	},
+ }
+ 
+ \tikzset{%
+ 	every neuron2/.style={
+ 		circle,
+ 		draw,
+ 		minimum size=.6cm
+ 	},
+ 	neuron2 100/.style={
+ 		draw=none, 
+ 		scale=1.5,
+ 		text height=0.233cm,
+ 		execute at begin node=\color{black}$\vdots$
+ 	},
+ }
+ 
+ \tikzset{%
+ 	every empty-neuron/.style={
+ 		minimum size=.6cm
+ 	}
+ }
+
+\begin{document}
+	\begin{circuitikz}
+		\ctikzset{tripoles/mos style=arrows}
+		\ctikzset{transistors/arrow pos=end}
+		
+		\tikzstyle{every node}=[font={{\LARGE }}]
+		
+		\newcommand{\diodecon}[1]{\draw (#1.gate) node[circ]{} |-  (#1.drain) node[circ]{}}
+		
+		
+		\coordinate (start-wcm) at (6.4,5);
+		\coordinate (start-iwcm1) at (8.6,5);
+		\coordinate (start-iwcm2) at (10.8,5);
+		\coordinate (start-wsccm) at (13,5);
+		\coordinate (start-ccm1) at (-.2,5);
+		\coordinate (start-ccm2) at (2,5);
+		\coordinate (start-ccm3) at (4.2,5);
+		\coordinate (start-scm1) at (6.4,2);
+		\coordinate (start-scm2) at (8.6,2);
+		\coordinate (start-scm3) at (10.8,2);
+		\coordinate (start-dp) at (13.8,2);
+		\coordinate (start-ccp) at (4.9, -2);
+		\coordinate (start-ccp2) at (6.1,-2);
+		\coordinate (start-ccp3) at (7.3,-2);
+		\coordinate (start-ai) at (3.6,-2);
+		\coordinate (start-cnaidt) at (2.2, -2);
+		
+		%	\coordinate (start-mcp) at (9,-4);
+		%	\coordinate (start-mcp2) at (11,-4);
+		%	\coordinate (start-ds) at (14,-4);
+		%	\coordinate (start-vr2) at (14,-8);
+		%	\coordinate (start-aindt) at (3,-8);
+		%	\coordinate (start-cai) at (6,-8);
+		%	\coordinate (start-cnai) at (0,-8);
+		%	\coordinate (start-ccdp) at (9,-8);
+		\coordinate (start-mcp11) at 		(8.5, -2);
+		\coordinate (start-mcp12) at 		(9.7, -2);
+		\coordinate (start-mcp21) at 	(10.9,-2);
+		\coordinate (start-mcp22) at 	(12.1,-2);
+		\coordinate (start-ds1) at 		(13.3,-2);
+		\coordinate (start-ds2) at 		(14.5,-2);
+		\coordinate (start-vr2) at 		(4.3,1.3);
+		\coordinate (start-caindt) at	(-2.5, -2);
+		\coordinate (start-caindt2) at	(-1.3, -2);
+		\coordinate (start-cai) at 		(-.2, -2);
+		\coordinate (start-cnai) at 	(1, -2);
+		\coordinate (start-ccdp) at 	(-2., 5);
+		
+		
+		\coordinate (start-gcc) at (1,3);
+		\coordinate (start-dt) at (-1.3,-6);
+		\coordinate (start-nt) at (-1.3,-8);
+		
+		
+		
+		%iwcm bbbb
+		\draw (start-iwcm1) node[nmos, anchor=source, xscale=-1, color=red](m1-iwcm){};
+		\draw (start-iwcm1) ++(2,0) node[nmos, anchor=source, color=red](m2-iwcm){};
+		\draw (m1-iwcm.D) node[nmos, anchor=source, xscale=-1, color=red](m3-iwcm){};
+		\draw (m2-iwcm.D) node[nmos, anchor=source, color=red](m4-iwcm){};
+		\diodecon{m1-iwcm};
+		\diodecon{m4-iwcm};
+		\draw (m1-iwcm.source) -- (m2-iwcm.source) ;
+		\draw (m1-iwcm.gate) -- (m2-iwcm.gate);
+		\draw (m1-iwcm.drain) -- (m3-iwcm.source);
+		\draw (m3-iwcm.gate) -- (m4-iwcm.gate);
+		\draw (m2-iwcm.drain) -- (m4-iwcm.source);
+		\draw (start-iwcm1) ++(1.2,0) node[below, text width=4.5cm, align=center]{iwcm$_{{\color{red}bbbb}}$};
+		%iwcm llll
+		\draw (start-iwcm2) node[nmos, anchor=source, xscale=-1, color=blue](m1-iwcm){};
+		\draw (start-iwcm2) ++(2,0) node[nmos, anchor=source, color=blue](m2-iwcm){};
+		\draw (m1-iwcm.D) node[nmos, anchor=source, xscale=-1, color=blue](m3-iwcm){};
+		\draw (m2-iwcm.D) node[nmos, anchor=source, color=blue](m4-iwcm){};
+		\diodecon{m1-iwcm};
+		\diodecon{m4-iwcm};
+		\draw (m1-iwcm.source) -- (m2-iwcm.source) ;
+		\draw (m1-iwcm.gate) -- (m2-iwcm.gate);
+		\draw (m1-iwcm.drain) -- (m3-iwcm.source);
+		\draw (m3-iwcm.gate) -- (m4-iwcm.gate);
+		\draw (m2-iwcm.drain) -- (m4-iwcm.source);
+		\draw (start-iwcm2) ++(1.2,0) node[below, text width=4.5cm, align=center]{iwcm$_{{\color{blue}llll}}$};
+		
+		%wcm
+		\draw (start-wcm) node[nmos, anchor=source, xscale=-1, color=blue](m1-wcm){};
+		\draw (start-wcm) ++(2,0) node[nmos, anchor=source, color=blue](m2-wcm){};
+		\draw (m2-wcm.D) node[nmos, anchor=source, color=blue](m4-wcm){};
+		\diodecon{m2-wcm};
+		\draw (m1-wcm.source) -- (m2-wcm.source) ;
+		\draw (m1-wcm.gate) -- (m2-wcm.gate);
+		\draw (m2-wcm.drain) -- (m4-wcm.source);
+		\draw (m4-wcm.G) -- ($(m4-wcm.G)-(1,0)$) node[circ]{};
+		\draw (m1-wcm.D) -- ++(0,1.5);
+		\draw (start-wcm) ++(1.2,0) node[below, text width=4.5cm, align=center]{wcm$_{{\color{blue}lll}}$};
+		
+		%scm bb
+		\draw (start-scm1)node[nmos, anchor=source, xscale=-1, color=red](m1-scm){};
+		\diodecon{m1-scm};
+		\draw (start-scm1) ++(2,0) node[nmos, anchor=source, color=red](m2-scm){};
+		\draw (m1-scm.source) -- (m2-scm.source);
+		\draw (m1-scm.gate) -- (m2-scm.gate);
+		\draw (start-scm1) ++(1.2,0) node[below, text width=4.5cm, align=center]{scm$_{{\color{red}bb}}$};
+		%scm ll
+		\draw (start-scm2)node[nmos, anchor=source, xscale=-1, color=blue](m1-scm){};
+		\diodecon{m1-scm};
+		\draw (start-scm2) ++(2,0) node[nmos, anchor=source, color=blue](m2-scm){};
+		\draw (m1-scm.source) -- (m2-scm.source);
+		\draw (m1-scm.gate) -- (m2-scm.gate);
+		\draw (start-scm2) ++(1.2,0) node[below, text width=4.5cm, align=center]{scm$_{{\color{blue}ll}}$};
+		%scm bl
+		\draw (start-scm3)node[nmos, anchor=source, xscale=-1, color=red](m1-scm){};
+		\diodecon{m1-scm};
+		\draw (start-scm3) ++(2,0) node[nmos, anchor=source, color=blue](m2-scm){};
+		\draw (m1-scm.source) -- (m2-scm.source);
+		\draw (m1-scm.gate) -- (m2-scm.gate);
+		\draw (start-scm3) ++(1.2,0) node[below, text width=4.5cm, align=center]{scm$_{{\color{red}b}{\color{blue}l}}$};
+		
+		%dp
+		\draw (start-dp) node[nmos, anchor=source, color=green](m1-dp){};
+		\draw (start-dp) ++(1,0) node[nmos, anchor=source, xscale=-1, color=green](m2-dp){};
+		\draw (m1-dp.S) -- (m2-dp.S);
+		\draw (start-dp) ++(.7,0) node[below, text width=4.5cm, align=center]{dp$_{{\color{green}tt}}$};
+		
+		%ccdp
+		\draw (start-ccdp) node[nmos, anchor=source, color=green](m1-ccdp){};
+		\draw (start-ccdp) ++(1,0) node[nmos, anchor=source, xscale=-1, color=green](m2-ccdp){};
+		\draw (m1-ccdp.D) node[nmos, anchor=source, color=blue](m3-ccdp){};
+		\draw (m2-ccdp.D) node[nmos, anchor=source, color=blue](m4-ccdp){};
+		\draw (m1-ccdp.S) -- (m2-ccdp.S);
+		\draw (m3-ccdp.G) -- (m4-ccdp.G);
+		\draw (start-ccdp) ++(.7,0) node[below, text width=4.5cm, align=center]{ccdp$_{{\color{green}tt}{\color{blue}ll}}$};
+		
+		%wsccm
+		\draw (start-wsccm) node[nmos, anchor=source, xscale=-1, color=blue](m1-wsccm){};
+		\draw (start-wsccm) ++(2,0) node[nmos, anchor=source, xscale=1, color=blue](m2-wsccm){};
+		\draw (m1-wsccm.D) node[nmos, anchor=source, xscale=-1, color=blue](m3-wsccm){};
+		\draw (m2-wsccm.D) node[nmos, anchor=source, xscale=-1, color=blue](m4-wsccm){};
+		\draw (m1-wsccm.S) -- (m2-wsccm.S);
+		\draw (m1-wsccm.G) -- (m2-wsccm.G);
+		\draw (m1-wsccm.G) node[circ]{} |- (m3-wsccm.D)node[circ]{};
+		\draw (m4-wsccm.G) -- (m3-wsccm.G);
+		\draw (start-wsccm) ++(1.2,0) node[below, text width=4.5cm, align=center]{wsccm$_{{\color{blue}llll}}$};
+		
+		%ccm bbbb
+		\draw (start-ccm1) node[nmos, anchor=source, xscale=-1, color=red](m1-ccm){};
+		\draw (start-ccm1) ++(2,0) node[nmos, anchor=source, color=red](m2-ccm){};
+		\draw (m1-ccm.D) node[nmos, anchor=source, xscale=-1, color=red](m3-ccm){};
+		\draw (m2-ccm.D) node[nmos, anchor=source, color=red](m4-ccm){};
+		\diodecon{m3-ccm};
+		\diodecon{m1-ccm};
+		\draw (m1-ccm.source) -- (m2-ccm.source) ;
+		\draw (m1-ccm.gate) -- (m2-ccm.gate);
+		\draw (m1-ccm.drain) -- (m3-ccm.source);
+		\draw (m3-ccm.gate) -- (m4-ccm.gate);
+		\draw (m2-ccm.drain) -- (m4-ccm.source);
+		\draw (start-ccm1) ++(1.2,0) node[below, text width=4.5cm, align=center]{ccm$_{{\color{red}bbbb}}$};
+		%ccm llll
+		\draw (start-ccm2) node[nmos, anchor=source, xscale=-1, color=blue](m1-ccm){};
+		\draw (start-ccm2) ++(2,0) node[nmos, anchor=source, color=blue](m2-ccm){};
+		\draw (m1-ccm.D) node[nmos, anchor=source, xscale=-1, color=blue](m3-ccm){};
+		\draw (m2-ccm.D) node[nmos, anchor=source, color=blue](m4-ccm){};
+		\diodecon{m3-ccm};
+		\diodecon{m1-ccm};
+		\draw (m1-ccm.source) -- (m2-ccm.source) ;
+		\draw (m1-ccm.gate) -- (m2-ccm.gate);
+		\draw (m1-ccm.drain) -- (m3-ccm.source);
+		\draw (m3-ccm.gate) -- (m4-ccm.gate);
+		\draw (m2-ccm.drain) -- (m4-ccm.source);
+		\draw (start-ccm2) ++(1.2,0) node[below, text width=4.5cm, align=center]{ccm$_{{\color{blue}llll}}$};
+		%ccm bbll
+		\draw (start-ccm3) node[nmos, anchor=source, xscale=-1, color=red](m1-ccm){};
+		\draw (start-ccm3) ++(2,0) node[nmos, anchor=source, color=blue](m2-ccm){};
+		\draw (m1-ccm.D) node[nmos, anchor=source, xscale=-1, color=red](m3-ccm){};
+		\draw (m2-ccm.D) node[nmos, anchor=source, color=blue](m4-ccm){};
+		\diodecon{m3-ccm};
+		\diodecon{m1-ccm};
+		\draw (m1-ccm.source) -- (m2-ccm.source) ;
+		\draw (m1-ccm.gate) -- (m2-ccm.gate);
+		\draw (m1-ccm.drain) -- (m3-ccm.source);
+		\draw (m3-ccm.gate) -- (m4-ccm.gate);
+		\draw (m2-ccm.drain) -- (m4-ccm.source);
+		\draw (start-ccm3) ++(1.2,0) node[below, text width=4.5cm, align=center]{ccm$_{{\color{red}bb}{\color{blue}ll}}$};
+		
+		%ai
+		\draw (start-ai) node[nmos, anchor=source, xscale=-1, color=blue](m1-ai){};
+		\draw (m1-ai.D) node[pmos, anchor=drain, xscale=-1, color=blue](m3-ai){};
+%		\draw (start-ai) ++(0,0) node[below, text width=4.5cm, align=center]{ai$_{{\color{blue}ll}}$};
+		\draw (start-ai) ++(0,0) node[below, text width=1cm, anchor=south west, align=left, rotate=-45]{ai$_{{\color{blue}ll}}$};
+		
+		%caindt llll
+		\draw (start-caindt) node[nmos, anchor=source, xscale=-1, color=blue](m1-aindt){};
+		\draw (m1-aindt.D) node[nmos, anchor=source, xscale=-1, color=blue](m2-aindt){};
+		\draw (m2-aindt.D) node[pmos, anchor=drain, xscale=-1, color=blue](m3-aindt){};
+		\draw (m3-aindt.S) node[pmos, anchor=drain, xscale=-1, color=blue](m4-aindt){};
+		\diodecon{m1-aindt};
+%		\draw (start-caindt) ++(0,0) node[ text width=4.5cm, anchor=south west, align=left, rotate=-45]{caind$_{{\color{blue}llll}}$};
+		\draw (start-caindt) ++(0,0) node[ text width=1cm, anchor=south west, align=left, rotate=-45]{caind$_{{\color{blue}llll}}$};
+		%caindt bgll
+		\draw (start-caindt2) node[nmos, anchor=source, xscale=-1, color=red](m1-aindt){};
+		\draw (m1-aindt.D) node[nmos, anchor=source, xscale=-1, color=green](m2-aindt){};
+		\draw (m2-aindt.D) node[pmos, anchor=drain, xscale=-1, color=blue](m3-aindt){};
+		\draw (m3-aindt.S) node[pmos, anchor=drain, xscale=-1, color=blue](m4-aindt){};
+		\diodecon{m1-aindt};
+%		\draw (start-caindt2) ++(0,0) node[below, text width=4.5cm, align=center]{caind$_{{\color{red}b}{\color{green}t}{\color{blue}ll}}$};
+		\draw (start-caindt2) ++(0,0) node[below, text width=1cm, anchor=south west, align=left, rotate=-45]{caind$_{{\color{red}b}{\color{green}t}{\color{blue}ll}}$};
+		
+		%cai
+		\draw (start-cai) node[nmos, anchor=source, xscale=-1, color=blue](m1-cai){};
+		\draw (m1-cai.D) node[nmos, anchor=source, xscale=-1, color=blue](m2-cai){};
+		\draw (m2-cai.D) node[pmos, anchor=drain, xscale=-1, color=blue](m3-cai){};
+		\draw (m3-cai.S) node[pmos, anchor=drain, xscale=-1, color=blue](m4-cai){};
+%		\draw (start-cai) ++(0,0) node[below, text width=4.5cm, align=center]{cai$_{{\color{blue}llll}}$};
+		\draw (start-cai) ++(0,0) node[below, text width=1cm,  anchor=south west, align=left, rotate=-45]{cai$_{{\color{blue}llll}}$};
+		
+		%cnai
+		\draw (start-cnai) node[nmos, anchor=source, xscale=-1, color=blue](m1-cnai){};
+		\draw (m1-cnai.D) node[nmos, anchor=source, xscale=-1, color=blue](m2-cnai){};
+		\draw (m2-cnai.D) node[pmos, anchor=drain, xscale=-1, color=blue](m3-cnai){};
+%		\draw (start-cnai) ++(.3,0) node[below, text width=4.5cm, align=center]{cnai$_{{\color{blue}llll}}$};
+		\draw (start-cnai) ++(0,0) node[below, text width=1cm,  anchor=south west, align=left, rotate=-45]{cnai$_{{\color{blue}llll}}$};
+		
+		%cnaidt
+		\draw (start-cnaidt) node[nmos, anchor=source, xscale=-1, color=blue](m1-cnaidt){};
+		\draw (m1-cnaidt.D) node[nmos, anchor=source, xscale=-1, color=blue](m2-cnaidt){};
+		\draw (m2-cnaidt.D) node[pmos, anchor=drain, xscale=-1, color=blue](m3-cnaidt){};
+		\diodecon{m1-cnaidt};
+%		\draw (start-cnaidt) ++(0,0) node[below, text width=4.5cm, align=center]{cnaid$_{{\color{blue}llll}}$};
+		\draw (start-cnaidt) ++(0,0) node[below, text width=1cm,  anchor=south west, align=left, rotate=-45]{cnaid$_{{\color{blue}llll}}$};
+		
+		%mcp1 bb
+		\draw (start-mcp11) node[nmos, anchor=source, xscale=-1, color=red](m1-mcp){};
+		\draw (m1-mcp.D) node[nmos, anchor=source, xscale=-1, color=red](m2-mcp){};
+		\diodecon{m1-mcp};
+%		\draw (start-mcp11) ++(0.1,0) node[below, text width=4.5cm, align=center]{mcp1$_{{\color{red}bb}}$};
+		\draw (start-mcp11) ++(0,0) node[below, text width=1cm, anchor=south west, align=left, rotate=-45]{mcp1$_{{\color{red}bb}}$};
+		%mcp1 ll
+		\draw (start-mcp12) node[nmos, anchor=source, xscale=-1, color=blue](m1-mcp){};
+		\draw (m1-mcp.D) node[nmos, anchor=source, xscale=-1, color=blue](m2-mcp){};
+		\diodecon{m1-mcp};
+%		\draw (start-mcp12) ++(0,0) node[below, text width=4.5cm, align=center]{mcp1$_{{\color{blue}ll}}$};
+		\draw (start-mcp12) ++(0,0) node[below, text width=1cm, anchor=south west, align=left, rotate=-45]{mcp1$_{{\color{blue}ll}}$};
+		
+		%mcp2 bb
+		\draw (start-mcp21) node[nmos, anchor=source, xscale=-1, color=red](m1-mcp2){};
+		\draw (m1-mcp2.D) node[nmos, anchor=source, xscale=-1, color=red](m2-mcp2){};
+		\diodecon{m2-mcp2};
+%		\draw (start-mcp21) ++(.25,0) node[below, text width=4.5cm, align=center]{mcp2$_{{\color{red}bb}}$};
+		\draw (start-mcp21) ++(0,0) node[below, text width=1cm, anchor=south west, align=left, rotate=-45]{mcp2$_{{\color{red}bb}}$};
+		%mcp2 ll
+		\draw (start-mcp22) node[nmos, anchor=source, xscale=-1, color=blue](m1-mcp2){};
+		\draw (m1-mcp2.D) node[nmos, anchor=source, xscale=-1, color=blue](m2-mcp2){};
+		\diodecon{m2-mcp2};
+%		\draw (start-mcp22) ++(.25,0) node[below, text width=4.5cm, align=center]{mcp2$_{{\color{blue}ll}}$};
+		\draw (start-mcp22) ++(0,0) node[below, text width=1cm, anchor=south west, align=left, rotate=-45]{mcp2$_{{\color{blue}ll}}$};
+		
+		%cp
+		\draw (start-ccp) node[nmos, anchor=source, xscale=-1, color=red](m1-ccp){};
+		\draw (m1-ccp.D) node[nmos, anchor=source, xscale=-1, color=red](m2-ccp){};
+%		\draw (start-ccp) ++(0,0) node[below, text width=4.5cm, align=center]{cp$_{{\color{red}bb}}$};
+		\draw (start-ccp) ++(0,0) node[below, text width=1cm, anchor=south west, align=left, rotate=-45]{cp$_{{\color{red}bb}}$};
+		%cp
+		\draw (start-ccp2) node[nmos, anchor=source, xscale=-1, color=blue](m1-ccp){};
+		\draw (m1-ccp.D) node[nmos, anchor=source, xscale=-1, color=blue](m2-ccp){};
+%		\draw (start-ccp2) ++(0,0) node[below, text width=4.5cm, align=center]{cp$_{{\color{blue}ll}}$};
+		\draw (start-ccp2) ++(0,0) node[below, text width=1cm, anchor=south west, align=left, rotate=-45]{cp$_{{\color{blue}ll}}$};
+		%cp
+		\draw (start-ccp3) node[nmos, anchor=source, xscale=-1, color=green](m1-ccp){};
+		\draw (m1-ccp.D) node[nmos, anchor=source, xscale=-1, color=red](m2-ccp){};
+%		\draw (start-ccp3) ++(0,0) node[below, text width=4.5cm, align=center]{cp$_{{\color{green}t}{\color{red}b}}$};
+		\draw (start-ccp3) ++(0,0) node[below, text width=1cm, anchor=south west, align=left, rotate=-45]{cp$_{{\color{green}t}{\color{red}b}}$};
+		
+		%gcc
+		\draw (start-gcc) node[nmos, anchor=source, xscale=-1, color=blue](m1-gcc){};
+		\draw (start-gcc) ++(1.5,0) node[nmos, anchor=source, color=blue](m2-gcc){};
+		\draw (m1-gcc.G) -- (m2-gcc.G);
+		\draw (start-gcc) ++(.75,.2) node[below, text width=4.5cm, align=center]{gcc$_{{\color{blue}ll}}$};
+		
+%		%dt
+%		\draw (start-dt)node[nmos, anchor=source, xscale=-1](m1-dt){};
+%		\diodecon{m1-dt};
+%		\draw (start-dt) ++(0,0) node[below, text width=4.5cm, align=center]{dt};
+%		
+%		%nt
+%		\draw (start-nt)node[nmos, anchor=source, xscale=-1](m1-nt){};
+%		\draw (start-nt) ++(0,0) node[below, text width=4.5cm, align=center]{nt};
+%		
+%		
+		%ds bb
+		\draw (start-ds1)node[nmos, anchor=source, xscale=-1, color=red](m1-ds){};
+		\draw (m1-ds.D)node[nmos, anchor=source, xscale=-1, color=red](m2-ds){};
+		\diodecon{m1-ds};
+		\diodecon{m2-ds};
+%		\draw (start-ds1) ++(.4,0) node[below, text width=4.5cm, align=center]{ds$_{{\color{red}bb}}$};
+		\draw (start-ds1) ++(0,0) node[below, text width=1cm, anchor=south west, align=left, rotate=-45]{ds$_{{\color{red}bb}}$};
+		%ds ll
+		\draw (start-ds2)node[nmos, anchor=source, xscale=-1, color=blue](m1-ds){};
+		\draw (m1-ds.D)node[nmos, anchor=source, xscale=-1, color=blue](m2-ds){};
+		\diodecon{m1-ds};
+		\diodecon{m2-ds};
+%		\draw (start-ds2) ++(.4,0) node[below, text width=4.5cm, align=center]{ds$_{{\color{blue}ll}}$};
+		\draw (start-ds2) ++(0,0) node[below, text width=1cm, anchor=south west, align=left, rotate=-45]{ds$_{{\color{blue}ll}}$};
+		
+		%vr2
+		\draw (start-vr2) node[nmos, anchor=source, xscale=1, color=blue](m1-vr2){};
+		\draw (m1-vr2.D) node[nmos, anchor=source, xscale=1, color=blue](m2-vr2){};
+		\draw (m1-vr2.G) node[circ]{} |- (m2-vr2.D)node[circ]{};
+		\draw (m2-vr2.G) -- ++(-.2,0);
+		\draw (start-vr2) ++(0,0) node[below, text width=4.5cm, align=center]{vr2$_{{\color{blue}ll}}$};
+
+\begin{scope}[shift={(18.35,8.5)}]
+	\node[anchor=west] at (0,0) {$\bm{y} \hspace{1cm} \rightarrow \hspace{1.2cm} \bm{x}$ };
+	\node[anchor=west, align=left, font=\fontsize{10pt}{5pt}\selectfont] at (-2.5,0) {\textbf{OpAmp} \\ \textbf{performance}};
+	\node[anchor=west, align=left, font=\fontsize{10pt}{5pt}\selectfont] at (4.1,0) {\footnotesize \textbf{device} \\ \textbf{size}};
+\end{scope}
+
+%\begin{scope}[shift={(6.5,7.5)}]
+%%	\draw [-latex, line width=3mm](9.5,-1) -- node[above]{training} (11.5,-1);
+%	\begin{scope}[shift={(13,-.5)}, scale=.6]
+%		\foreach \m/\l [count=\y] in {1,2,100,3,4}
+%		{
+%			\node [every neuron/.try, neuron \m/.try] (input-\m) at (0,2.5-\y) {};
+%			%		  		\ifnumequal{\m}{100}{}{\node[] at (-.7,2.5-\y) {{\normalsize $\phi_\m$}};}
+%		}
+%		\foreach \m/\l [count=\y] in {1,2,100,K-1,K}
+%		{
+%			\ifnumequal{\y}{3}{}{\node[anchor=west] at (-1.8,2.5-\y) {{\normalsize $y_{\m}$}};}
+%		}
+%		
+%		\foreach \m [count=\y] in {1, 2, 100,3,4}
+%		{
+%			\node [every neuron/.try, neuron \m/.try ] (hidden-\m) at (2,2.5-\y) {};
+%		}
+%		
+%		\foreach \m [count=\y] in {1,2}
+%		{
+%			\node [every neuron/.try, neuron \m/.try ] (output-\m) at (4,1-\y) {};
+%			\node[] at (4.7,1-\y) {{\footnotesize $\frac{W_\y}{L_\y}$}};
+%		}
+%		
+%		\foreach \i in {1,...,4}
+%		\foreach \j in {1,...,4}
+%		\draw [->] (input-\i) -- (hidden-\j);
+%		
+%		\foreach \i in {1,...,4}
+%		\foreach \j in {1,...,2}
+%		\draw [->] (hidden-\i) -- (output-\j);
+%		
+%		\draw (1,-3) node[below, text width=4.5cm, align=center]{scm$_{{\color{blue}ll}}$};
+%		
+%	\end{scope}
+%\end{scope}
+
+\begin{scope}[shift={(6.5,7.5)}]
+%	\draw [-latex, line width=3mm](9.5,-1) -- node[above]{training} (11.5,-1);
+	\begin{scope}[shift={(13,-.5)}, scale=.6]
+		\foreach \m/\l [count=\y] in {1,2,100,3,4}
+		{
+			\node [every neuron/.try, neuron \m/.try] (input-\m) at (0,2.5-\y) {};
+			%		  		\ifnumequal{\m}{100}{}{\node[] at (-.7,2.5-\y) {{\normalsize $\phi_\m$}};}
+		}
+		\foreach \m/\l [count=\y] in {1,2,100,K-1,K}
+		{
+			\ifnumequal{\y}{3}{}{\node[anchor=west] at (-1.8,2.5-\y) {{\normalsize $y_{\m}$}};}
+		}
+		
+		\foreach \m [count=\y] in {1, 2, 100,3,4}
+		{
+			\node [every neuron/.try, neuron \m/.try ] (hidden-\m) at (2,2.5-\y) {};
+		}
+		
+		\foreach \m [count=\y] in {1,2}
+		{
+			\node [every neuron/.try, neuron \m/.try ] (output-\m) at (4,1-\y) {};
+			\node[] at (4.7,1-\y) {{\footnotesize $\frac{W_\y}{L_\y}$}};
+		}
+		
+		\foreach \i in {1,...,4}
+		\foreach \j in {1,...,4}
+		\draw [->] (input-\i) -- (hidden-\j);
+		
+		\foreach \i in {1,...,4}
+		\foreach \j in {1,...,2}
+		\draw [->] (hidden-\i) -- (output-\j);
+		
+		\draw (1,-3) node[below, text width=4.5cm, align=center]{scm$_{{\color{red}bb}}$};
+		
+	\end{scope}
+\end{scope}
+
+\begin{scope}[shift={(6.5,4)}]
+	\draw [-latex, line width=3mm](9.5,-1) -- node[above]{training} (11.5,-1);
+	\begin{scope}[shift={(13,-.5)}, scale=.6]
+		\foreach \m/\l [count=\y] in {1,2,100,3,4}
+		{
+			\node [every neuron/.try, neuron \m/.try] (input-\m) at (0,2.5-\y) {};
+			%		  		\ifnumequal{\m}{100}{}{\node[] at (-.7,2.5-\y) {{\normalsize $\phi_\m$}};}
+		}
+		\foreach \m/\l [count=\y] in {1,2,100,K-1,K}
+		{
+			\ifnumequal{\y}{3}{}{\node[anchor=west] at (-1.8,2.5-\y) {{\normalsize $y_{\m}$}};}
+		}
+		
+		\foreach \m [count=\y] in {1, 2, 100,3,4}
+		{
+			\node [every neuron/.try, neuron \m/.try ] (hidden-\m) at (2,2.5-\y) {};
+		}
+		
+		\foreach \m [count=\y] in {1,2}
+		{
+			\node [every neuron/.try, neuron \m/.try ] (output-\m) at (4,1-\y) {};
+			\node[] at (4.7,1-\y) {{\footnotesize $\frac{W_\y}{L_\y}$}};
+		}
+		
+		\foreach \i in {1,...,4}
+		\foreach \j in {1,...,4}
+		\draw [->] (input-\i) -- (hidden-\j);
+		
+		\foreach \i in {1,...,4}
+		\foreach \j in {1,...,2}
+		\draw [->] (hidden-\i) -- (output-\j);
+		
+		\draw (1,-3) node[below, text width=4.5cm, align=center]{scm$_{{\color{red}b}{\color{blue}l}}$};
+		
+	\end{scope}
+\end{scope}
+
+\begin{scope}[shift={(6.5,0.5)}]
+%	\draw [-latex, line width=3mm](9.5,-1) -- node[above]{training} (11.5,-1);
+	\begin{scope}[shift={(13,-.5)}, scale=.6]
+		\foreach \m/\l [count=\y] in {1,2,100,3,4}
+		{
+			\node [every neuron/.try, neuron \m/.try] (input-\m) at (0,2.5-\y) {};
+			%		  		\ifnumequal{\m}{100}{}{\node[] at (-.7,2.5-\y) {{\normalsize $\phi_\m$}};}
+		}
+		\foreach \m/\l [count=\y] in {1,2,100,K-1,K}
+		{
+			\ifnumequal{\y}{3}{}{\node[anchor=west] at (-1.8,2.5-\y) {{\normalsize $y_{\m}$}};}
+		}
+		
+		\foreach \m [count=\y] in {1, 2, 100,3,4}
+		{
+			\node [every neuron/.try, neuron \m/.try ] (hidden-\m) at (2,2.5-\y) {};
+		}
+		
+		\foreach \m [count=\y] in {1,2}
+		{
+			\node [every neuron/.try, neuron \m/.try ] (output-\m) at (4,1-\y) {};
+			\node[] at (4.7,1-\y) {{\footnotesize $\frac{W_\y}{L_\y}$}};
+		}
+		
+		\foreach \i in {1,...,4}
+		\foreach \j in {1,...,4}
+		\draw [->] (input-\i) -- (hidden-\j);
+		
+		\foreach \i in {1,...,4}
+		\foreach \j in {1,...,2}
+		\draw [->] (hidden-\i) -- (output-\j);
+		
+		\draw (1,-3) node[below, text width=4.5cm, align=center]{dp$_{{\color{green}tt}}$};
+		
+	\end{scope}
+\end{scope}
+
+\draw[] (20,-3) node[scale=4]{\color{black}$\vdots$};
+
+		
+		
+	\end{circuitikz}
+\end{document} 

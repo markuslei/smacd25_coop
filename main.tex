@@ -53,12 +53,28 @@ We address those challenges by combining two state of the art machine learning a
 	
 	Analog design is inherently an inverse problem. While the calculation of performances, yield etc., is satisfactorily possible via simulation, the inverse, i.e. getting a circuit with optimal parametrization requires experience, trial and error and complex numerical routines. As shown in previous works \cite{ leibl24inverse, lourenco19pareto}, machine learning (ML) methods can be used to accurately reproduce sizings on (pareto) optimal fronts. Furthermore, it has been shown \cite{eid24diffusion} that diffusion models are well adaptable to the inverse sizing problem. Other ML based works attempted to solve this same problem. In \cite{lourenco18}, artificial neural networks (ANNs) are used to guess circuit sizings, utilizing only one ANN for modeling an entire netlist, leading to a higher learning task complexity and thus large sample sizes (in \cite{lourenco18} $16600$ or roughly $16-160 \, x$ sample sizes used in this work) are required to learn the inverse problem within a smaller performance range. In \cite{beaulieu23cascaded}, the problem is broken down into smaller tasks, and one ANN is trained to sequentially size a single device, in the same vein as \cite{leibl24inverse}, feeding the outputs of the previous ANNs to the input of the next, producing a cascade of networks that can be sorted in different ways, until an optimal order is found. The drawback is that for more complex circuits of e.g. 15 devices, optimally ordering the ANNs for sizing leads to a complexity of 15!.
 	
-	Other works follow the traditional approach of tackling the direct sizing problem, treating it as an optimization problem \cite{fayazi23angel, budak23apostle, wolfe03nnmodel, hakhamaneshi23pretraining}. Reinforcement learning was also studied, with \cite{gao23rose, settaluri22reinforcement, zhang23multiagentRL}  replacing the optimizer with an artificial neural network (ANN), leading to improvements in prediction speed, accuracy, and scalability. In the end, all of these works suffer from lengthy training and simulation times.
+	Other works follow the traditional approach of tackling the direct sizing problem, treating it as an optimization problem \cite{fayazi23angel, budak23apostle, wolfe03nnmodel, hakhamaneshi23pretraining}. Reinforcement learning was also studied, with \cite{gao23rose, settaluri22reinforcement, zhang23multiagentRL}  replacing the optimizer with an artificial neural network (ANN), leading to improvements in prediction speed, accuracy, and scalability. 
+	However, to the best of our knowledge, none of them show strengths in all four categories, speed, accuracy, sample efficiency and exploration.
+	%In the end, all of these works suffer from lengthy training and simulation times.
 	
-	In this work, we explore the application of denoising diffusion probabilistic models (DDPM) to the sizing of OpAmps, utilizing the approach in \cite{leibl24inverse} of subdividing the circuits into simpler structures, and by leveraging sampled sizings from the open-source tool FUBOCO \cite{fuboco-github}. These models efficacy in the inverse sizing problem were proven in \cite{eid24diffusion}. Each DDPM is trained on a different structure of the target circuit, learning the corresponding distribution of sizes and respective performances by the noising and denoising process. After training, the DDPMs can be sampled to generate sizing values for each structure, which when combined make up the whole sizing solution of the target OpAmp. As shown in Section IV, this approach to the inverse problem can produce a more varied set of possible sizings, which is very helpful when exploring sizing options in the vicinity of performance optima. The contributions of this work are as follows: 
+	In this work, we aim for a combination of all those virtues by applying denoising diffusion probabilistic models (DDPM) to the sizing of OpAmps, utilizing the approach in \cite{leibl24inverse} of subdividing the circuits into simpler structures, which has shown high accuracy for low sample sizes. DDPMs have proven their potential for generating strongly varied, but realistic results in other fields, OpenAi's DALL-E and Stable Diffusion being among the most prominent examples. \cite{eid24diffusion} proved these model's efficacy in the inverse sizing problem.
+	
+%	In this work, we explore the application of denoising diffusion probabilistic models (DDPM) to the sizing of OpAmps, utilizing the approach in \cite{leibl24inverse} of subdividing the circuits into simpler structures, and by leveraging sampled sizings from the open-source tool FUBOCO \cite{fuboco-github}. These models efficacy in the inverse sizing problem were proven in \cite{eid24diffusion}. 
+%	Each DDPM is trained on a different structure of the target circuit, learning the corresponding distribution of sizes and respective performances by the noising and denoising process. 
+%	After training, the DDPMs can be sampled to generate sizing values for each structure, which when combined make up the whole sizing solution of the target OpAmp. 
+	Unlike most machine learning models, DDPMs can suggest different sizings for the same problem by repeatedly sampling them.
+	As shown in Section IV, this approach to the inverse problem can produce a more varied set of possible sizings, which is very helpful when exploring sizing options in the vicinity of performance optima. 
+%	The contributions of this work are as follows: 
+This work contributes a machine learning approach that:
+%	\begin{itemize}
+%	\item suggest valid sizings that perform in the vicinity of the required metrics, allowing for exploration of a sizing area of interest
+%	\item generate sizing solutions at push-button speed
+%	\end{itemize}
 	\begin{itemize}
-	\item suggest valid sizings that perform in the vicinity of the required metrics, allowing for exploration of a sizing area of interest
-	\item generate sizing solutions at push-button speed
+	\item can suggest valid sizings with resulting performance in the vicinity of the required metrics, allowing for exploration of sizings while still fulfilling specifications
+	\item is highly data efficient
+	\item has an accurate expectation of the generated sizings
+	\item generates sizing solutions at push-button speed
 	\end{itemize}
 	
  	In section \ref{sec:intro2}, we provide an overview of the proposed method and its connection to structural analysis. 

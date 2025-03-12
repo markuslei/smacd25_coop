@@ -1,0 +1,96 @@
+\documentclass[]{standalone}
+\usepackage{tikz}
+\usepackage[siunitx]{circuitikz} % Loading circuitikz with siunitx option
+%\usetikzlibrary{positioning}
+\usetikzlibrary{calc}
+
+\newcommand*{\xMin}{0}%
+\newcommand*{\xMax}{4}%
+\newcommand*{\yMin}{0}%
+\newcommand*{\yMax}{-4}%
+
+\begin{document}
+	\begin{circuitikz}
+		\ctikzset{tripoles/mos style=arrows}
+		\ctikzset{transistors/arrow pos=end}
+		\coordinate (start) at (0,0);
+		
+		%cm
+		\draw (start) node[pmos, anchor=source, xscale=-1](m1){};
+		\draw (m1.base) node[left=20]{$M2$};
+%		\draw (m1.gate) node[circ]{} |- (m1.drain) node[circ]{};
+		\draw (m1.gate) node[circ]{} |- ($(m1.drain)+(0,.2)$) node[circ]{};
+		\draw (start) ++(3,0) node[pmos, anchor=source](m2){};
+%		\draw (m2.base) node[below right=150]{$M2$};
+		\draw (m2.drain) node[above right]{$M8$};
+		\draw (m1.gate) -- (m2.gate) node(con1){}; %netBias
+		\draw (m1.source) -- (m2.source); %netVdd
+		\draw (m1.D) +(0,-.4) to[short, o-, i=$I_{b}$] (m1.D); %Bias current in
+%		\path ($(m1.gate)!0.5!(m2.gate)$) node[below]{$net_{bias}$};
+		
+		
+		%VDD
+		\draw (m2.S) to[short,*-o] ++(0,0.5) node[right]{$V_{dd}$};
+%		\path ($(m1.source)!0.5!(m2.source)$) node[above]{$net_{v_{dd}}$};
+		
+		%dp
+		\draw (m2.drain) ++(-1.2,-.2) node[pmos, anchor=source](m3){};
+		\draw (m3.base) node[right=20]{$M7$};
+		\draw (m2.drain) ++(+1.2,-.2) node[pmos, anchor=source, xscale=-1](m4){};
+		\draw (m4.base) node[left=20]{$M6$};
+		\draw (m3.source) -- (m4.source);
+		\draw (m2.drain) to[short, -*] ++(0,-.2); %net1
+%		\path ($(m3.source)!0.5!(m4.source)$) node[below]{$net_{1}$};
+		
+		%input connections
+		\draw (m3.G) ++(0,0) to[short, o-] (m3.G);
+		\draw (m3.G) ++(0,-.8) to[short, o-] ++(3.5, 0) -| ($(m4.G)+(0,0)$);
+%		\draw (m3.G) ++(-1.2, -.75)  node[]{$V_{in}$};
+		\draw (m3.G) ++(-.1, -.2)  node[]{$V_{in-}$};
+		\draw (m3.G) ++(-.1, -1)  node[]{$V_{in+}$};
+		
+		%cml
+		\path (0,-.4) coordinate(lower-transistors-offset);
+		\draw (m3.drain) ++(lower-transistors-offset) node[nmos, anchor=drain, xscale=-1](m5){};
+		\draw (m5.base) node[left=30]{$M1$};
+		\draw (m3.drain) -- (m5.drain);
+		\draw (m4.drain) ++(lower-transistors-offset) node[nmos, anchor=drain](m6){};
+		\draw ($(m5.gate)+(-.16,0)$) node[circ]{} |- ($(m5.drain)+(0,-.2)$) node[circ]{};%net2
+%		\path ($(m5.drain)!0.2!(m3.source)$) node[right]{$net_{2}$};
+		\draw (m6.base) node[right=30]{$M4$};
+		\draw (m4.drain) -- (m6.drain);
+		\draw (m5.gate) -- (m6.gate);
+		\draw (m5.source) -- (m6.source);
+		
+		%stage2
+		\path (2,0) coordinate(2nd-stage-offset);
+		\draw (m6.drain) ++(2nd-stage-offset) node[nmos, anchor=gate](m7){};
+		\draw (m7.base) node[right=20]{$M3$};
+		\draw (m6.drain) node[circ]{} -- (m7.gate); %net3
+%		\path ($(m6.drain)!0.2!(m4.source)$) node[right]{$net_{3}$};
+		\draw (m7.source) |- (m6.source) node[circ]{}; %netGnd
+%		\path ($(m5.source)!0.3!(m6.source)$) node[below]{$net_{Gnd}$};
+		
+		\draw (m7.drain) -- ++(0,.75) coordinate(outnode);
+		\draw 
+			let 
+				\p1=(m2.drain),
+				\p2=(outnode)
+			in
+				(\x2, \y1) node[pmos, anchor=drain](m8){};
+		\draw (m8.drain) -- (outnode);
+		\draw (m8.source) |- (m2.source) node[circ]{};
+		\draw (m8.gate) -- (m2.gate);
+		\draw (m8.base) node[right=20]{$M5$};
+%		\draw (outnode)  to[R,l_=$R$] ++(0,3) |- (m2.source) node[circ]{};
+		\path ($(m6.drain)!0.7!(m7.gate)$) coordinate(m6-m7-midnode);
+		\draw (outnode) to[/tikz/circuitikz/bipoles/length=0.7cm, C,l_=$C_1$] ++(-1.,0) -| ($(m6-m7-midnode)+(.3,0)$) node[circ]{};
+		\draw (outnode) to[short, *-o] ++(.5,0) node[below]{\small$V_{out}$};
+%		\path ($(outnode)!0.5!(m8.drain)$) node[right]{$net_{out}$};
+		
+		%GND
+		\draw (m6.S) node[ground]{};
+%		\draw (m6.S) to[short,*-o] ++(0,-1) node[right]{$Gnd$};
+		
+	\end{circuitikz}
+\end{document}

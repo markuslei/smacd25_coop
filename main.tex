@@ -109,41 +109,57 @@ This work contributes a machine learning approach that:
 	\setlength{\abovecaptionskip}{1ex}%
 	\setlength{\belowcaptionskip}{-3ex}%
  	\subsection{Basics of Structural and Functional Blocks}
- 	Our method heavily relies on decomposing circuits into subcircuits, which we call structural building blocks. Most building blocks are known to the analog designer by names such as \textit{current mirror} or \textit{differential pair}.
-
-	We further distinguish different functional variants of one and the same structural block.
-	To this end, we assign to every transistor in a circuit its functional property, out of three different possibilities: \textit{bias, load} or \textit{transconductance}. 
-	 For example, a \textit{simple current mirror} (scm) can act as \textit{load}, but in other parts of a circuit, the same building block can act as \textit{bias}. And sometimes, some part of a current mirror can act as \textit{load}, while another part acts as \textit{bias}. Figure~\ref{fig:overview-structure} shows all structural blocks and their functional variants from our dataset.
+ 	As detailed in \cite{ leibl24inverse}, the method  relies on the decomposition of circuits into subcircuits, which we call structural building blocks.
+ 	While the structure of the blocks is defined by their topology, i.e. the devices and their interconnections, we identify three functional properties, \textit{bias, load} or \textit{transconductance}, for each individual transistor. This leads to further discrimination among the structural blocks. But because not every combination of functional properties is useful, the total set of possible structures remains small. 
+	All possible variants of blocks can be found in figure~\ref{fig:overview-structure}. Figure~\ref{fig:simple53} shows an exemplary decomposition into blocks for a Folded-Cascode OpAmp.
+	
 	An example of decomposing a Folded-Cascode OpAmp into blocks can be seen in figure~\ref{fig:simple53}. Its structural building blocks are shaded, the names annotated close by.
 	Structural and functional block recognition is fully automated. The time required for this is much less than one second. 
 	
 \subsection{Overview of the Method}
-
 	\begin{figure}[]
-		\begin{subfigure}{.48\textwidth}
-			\centering
-			\includegraphics[width=\linewidth]{figures/simple52_partitioning}
-			\setlength{\abovecaptionskip}{0ex}%
-	%		\setlength{\belowcaptionskip}{-2ex}%
-			\setlength{\belowcaptionskip}{0ex}%
-			\caption{Folded Cascode Operational Amplifier (OpAmp A).}
-			\label{fig:simple53}
-		\end{subfigure}
-			\hfill
-		\begin{subfigure}{.5\textwidth}
-			\centering
-			\includegraphics[width=\linewidth]{figures/finetuning-networks2}
-			\setlength{\abovecaptionskip}{-2ex}%
-	%		\setlength{\belowcaptionskip}{-2ex}%
-			\caption{Process of transfer learning.}
-			\label{fig:fine-tuning}
-		\end{subfigure}
-			\setlength{\abovecaptionskip}{3ex}%
-			\setlength{\belowcaptionskip}{-3ex}%
-%			\caption{Folded Cascode OpAmp (\ref{fig:simple53}) and process of transfer learning (\ref{fig:fine-tuning}): Instead of training one huge network per OpAmp, we can use weights from our database as initial training points to merely fine-tune our networks }
-			\caption{Instead of training one huge network per OpAmp, we can split an Opamp, e.g. OpAmp A, into blocks (shading and coloring in fig.~\ref{fig:simple53}) and use weights from our network-database as initial training points to merely fine-tune our networks~(\ref{fig:fine-tuning}). }
-			\label{fig:training-process}
-		\end{figure}
+		\centering
+		\includegraphics[width=\linewidth]{figures/simple52_partitioning}
+%		\setlength{\abovecaptionskip}{0ex}%
+%		\setlength{\belowcaptionskip}{-2ex}%
+		\caption{Folded-Cascode OpAmp. The circuit is decomposed into its structural and functional blocks. Here the structural blocks are shaded, while the functionality of the devices is represented by colours. }
+		\label{fig:simple53}
+	\end{figure}
+	
+	In contrast to \cite{ leibl24inverse} we use a simplified version of the model. We skip the pretraining step and directly finetune the networks. Furthermore, instead of using gain boosting for sizing of $L$, we employ the same model type.
+	The sizing process is then straight forward:
+	\begin{itemize}
+	\item We split the opamp into the predefined subblocks.
+	\item We train a neural netork for each of the subblocks, where we use the OpAmp performance as guidance for the DDPM model and train to recover only the sizing sof the blocks
+	\item Finally, at evaluation time, we recombine the predicted sizings. In case of overlap of two blocks, we take the average value.
+	\end{itemize}
+	Like in the previous work, we enforce symmetry that can be automatically detected by deterministic algorithms. For symmetry within blocks, this is done during training, for symmetry outside of blocks, this is done during recombination.
+			
+%	\begin{figure}[]
+%		\begin{subfigure}{.48\textwidth}
+%			\centering
+%			\includegraphics[width=\linewidth]{figures/simple52_partitioning}
+%			\setlength{\abovecaptionskip}{0ex}%
+%	%		\setlength{\belowcaptionskip}{-2ex}%
+%			\setlength{\belowcaptionskip}{0ex}%
+%			\caption{Folded Cascode Operational Amplifier (OpAmp A).}
+%			\label{fig:simple53}
+%		\end{subfigure}
+%			\hfill
+%		\begin{subfigure}{.5\textwidth}
+%			\centering
+%			\includegraphics[width=\linewidth]{figures/finetuning-networks2}
+%			\setlength{\abovecaptionskip}{-2ex}%
+%	%		\setlength{\belowcaptionskip}{-2ex}%
+%			\caption{Process of transfer learning.}
+%			\label{fig:fine-tuning}
+%		\end{subfigure}
+%			\setlength{\abovecaptionskip}{3ex}%
+%			\setlength{\belowcaptionskip}{-3ex}%
+%%			\caption{Folded Cascode OpAmp (\ref{fig:simple53}) and process of transfer learning (\ref{fig:fine-tuning}): Instead of training one huge network per OpAmp, we can use weights from our database as initial training points to merely fine-tune our networks }
+%			\caption{Instead of training one huge network per OpAmp, we can split an Opamp, e.g. OpAmp A, into blocks (shading and coloring in fig.~\ref{fig:simple53}) and use weights from our network-database as initial training points to merely fine-tune our networks~(\ref{fig:fine-tuning}). }
+%			\label{fig:training-process}
+%		\end{figure}
 		
 		\begin{figure}[]
 		\begin{subfigure}{0.12\textwidth}

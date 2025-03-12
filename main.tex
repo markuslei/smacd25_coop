@@ -48,7 +48,7 @@ We address those challenges by combining two state of the art machine learning a
 %component, formatting, style, styling, insert
 %\end{IEEEkeywords}
 
-\section{Introduction}
+\section{Introduction}\label{sec:intro}
 	Since the development of SPICE, the industry accepted method for designing analog circuits has not changed much. While the SPICE models keep becoming more complex \cite{gatermann22mosfet}, the approach of manual device tuning persists \cite{gielen23workshop}. Key challenges of making analog CAD tools useful in practice are robustness, ease of use and applicability to a high range of use cases. All those aspects are not easy to grasp on a fundamental level. On the other hand, machine learning approaches excel in modeling nonlinear black box phenomena. Their combination with already existing conventional techniques has a high potential to bridge remaining gaps, that prevent the adoption of tools in industry.
 	
 	Analog design is inherently an inverse problem. While the calculation of performances, yield etc., is satisfactorily possible via simulation, the inverse, i.e. getting a circuit with optimal parametrization requires experience, trial and error and complex numerical routines. As shown in previous works \cite{ leibl24inverse, lourenco19pareto}, machine learning (ML) methods can be used to accurately reproduce sizings on (pareto) optimal fronts. Furthermore, it has been shown \cite{eid24diffusion} that diffusion models are well adaptable to the inverse sizing problem. Other ML based works attempted to solve this same problem. In \cite{lourenco18}, artificial neural networks (ANNs) are used to guess circuit sizings, utilizing only one ANN for modeling an entire netlist, leading to a higher learning task complexity and thus large sample sizes (in \cite{lourenco18} $16600$ or roughly $16-160 \, x$ sample sizes used in this work) are required to learn the inverse problem within a smaller performance range. In \cite{beaulieu23cascaded}, the problem is broken down into smaller tasks, and one ANN is trained to sequentially size a single device, in the same vein as \cite{leibl24inverse}, feeding the outputs of the previous ANNs to the input of the next, producing a cascade of networks that can be sorted in different ways, until an optimal order is found. The drawback is that for more complex circuits of e.g. 15 devices, optimally ordering the ANNs for sizing leads to a complexity of 15!.
@@ -199,7 +199,43 @@ This work contributes a machine learning approach that:
 		\label{fig:perffeatures53}
 		\end{figure}
 	
-
+\section{DDPM Background and Implementation}\label{sec:ddpm}
+	As mentioned in sec \ref{sec:intro}, several DDPMs are trained to learn the sizing and respective performances distribution of the different structures that make up the opamp. DDPMs were first introduced in \cite{ho2020denoisingdiffusionprobabilisticmodels} as a new diffusion model parametrization, which are a class of NNs mostly used in an imaging context, like data generation and restauration. These models are composed of 3 different processes, which are briefly highlighted here:
+	
+	\subsubsection{Forward Process}
+	First, the training data $x_{t}$ is systematically destroyed by the addition of noise over $T$ sequential timesteps. This noise is sampled from a Gaussian distribution and at the end of the $T$ timesteps, the resulting training data distribution resembles itself a Gaussian distribution. This process is demonstrated by equation \ref{eq:forward}, where $\beta_{t}$ is the variance scheduler, a hyperparameter that controls how much noise is added to the data $x$ at each time timestep $t$.
+	
+	\begin{equation} \label{eq:forward}
+	q(x_{t}|x_{t-1}) := \mathcal{N}(x_{t};\mu,\Sigma) := \mathcal{N}(x_{t};\sqrt{1-\beta_{t}}x_{t-1}, \beta_{t}I)
+	\end{equation}
+	
+	\subsubsection{Reverse Process}
+	After the data is destroyed at $x_{T}$, an ANN is trained to try to reverse the forward process, either by predicting the original data $x_{0}$ up front, or by predicting another value that can be used to reconstruct the original data, like the added noise, etc. This process is represented by equation \ref{eq:reverse}, where $\alpha_{t}=1-\beta_{t}$ and $\overline{\alpha}_{t}=\prod_{s=1}^{t}\alpha_{s}$.
+	
+	\begin{equation} \label{eq:reverse}
+		\rho_{\theta}(x_{t-1}|x_{t}) := \mathcal{N}(x_{t-1};\mu_{\theta}(x_{t},t),\Sigma_{\theta}(x_{t},t)) := \mathcal{N}(x_{t};\frac{1}{\sqrt{\alpha_{t}}}(x_{t}-\frac{1-\alpha_{t}}{\sqrt{1-\overline{\alpha}_{t}}}\epsilon_{\theta}(x_{t},t)),\beta_{t}I) 
+	\end{equation}
+	
+	The correlation between the forward and reverse process to noise and denoise images can be seen in Fig \ref{fig:forward_reverse}.
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=\linewidth]{figures/ForwardReverseDDPM}
+		\setlength{\abovecaptionskip}{0ex}%
+		\setlength{\belowcaptionskip}{-2ex}%
+		\caption{Correlation between forward and reverse}
+		\label{fig:forward_reverse}
+	\end{figure}
+	
+	\subsubsection{Sampling Process}
+	Finally, after the model is trained, the sampling process is used to generate new data. The model learned to reconstruct the original data, and so by giving it pure Gaussian noise it tries to reconstruct data. Except this time, there is no actual data in the first place, marking this a form of generative AI.
+	
+	It was shown by \cite{eid24diffusion} that DDPMs produce interesting results when applied to the inverse sizing problem. In this work, a similar implementation is considered, with a cosine schedule for $\beta$ and classifier-free guidance \cite{ho2022classifierfreediffusionguidance}, but with 2 key differences:
+	
+	\begin{itemize}
+		\item instead of predicting the noise $\epsilon$, the implemented model predicts a velocity equation $v$ which has been shown to enable a true signal-to-noise ratio of $0$ at the last timestep $T$, removing an important discrepancy between training and inference \cite{lin2024commondiffusionnoiseschedules};
+		\item the backbone of the model implemented here is a transformer, with an architecture similar to \cite{peebles2023scalablediffusionmodelstransformers}, as opposed to the simple multi-layer perceptrons implemented by \cite{eid24diffusion}. To predict a more complex value in $v$ a stronger architecture was required.
+	\end{itemize}
 	
 	
 \section{Conclusion}

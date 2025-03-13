@@ -77,8 +77,7 @@ This work contributes a machine learning approach that:
 	\item generates sizing solutions at push-button speed
 	\end{itemize}
 	
- 	In section \ref{sec:intro2}, we provide an overview of the proposed method and its connection to structural analysis. 
- 	In sec.~\ref{sec:sizing}, we describe the sizing process in detail. We conclude with a presentation of results for two OpAmps.
+ 	In section \ref{sec:intro2}, we provide an overview of the proposed method and its connection to structural analysis, as well as describing the sizing process in detail. In section \ref{sec:ddpm}, a short background of DDPMs and our implemented models are presented. We conclude with a presentation of results for two OpAmps, in section \ref{sec:results}.
 	
 %
 %    With increasing MOSFET model complexity \cite{gatermann22mosfet}, analog design, particularly OpAmp design, remains manual in industrial practice \cite{gielen23workshop}, despite the existence of automatic tools. Various procedural methods for automated design have been discussed in \cite{prautsch16reuse, crossley13bag, schweikardt22scheible}. The idea of using smaller building blocks and hierarchical strategies is successfully demonstrated, e.g., in \cite{meissner15feats, abel2022fuboco, mendhurwar2012structureneural, synthesis23zhang, canelas22hierachical}. 
@@ -111,7 +110,7 @@ This work contributes a machine learning approach that:
  	\subsection{Basics of Structural and Functional Blocks}
  	As detailed in \cite{ leibl24inverse}, the method  relies on the decomposition of circuits into subcircuits, which we call structural building blocks.
  	While the structure of the blocks is defined by their topology, i.e. the devices and their interconnections, we identify three functional properties, \textit{bias, load} or \textit{transconductance}, for each individual transistor. This leads to further discrimination among the structural blocks. But because not every combination of functional properties is useful, the total set of possible structures remains small. 
-	All possible variants of blocks can be found in figure~\ref{fig:overview-structure}. Figure~\ref{fig:simple53} shows an exemplary decomposition into blocks for a Folded-Cascode OpAmp.
+	All possible variants of blocks can be found in figure~\ref{fig:overview-structure}.
 	
 	An example of decomposing a Folded-Cascode OpAmp into blocks can be seen in figure~\ref{fig:simple53}. Its structural building blocks are shaded, the names annotated close by.
 	Structural and functional block recognition is fully automated. The time required for this is much less than one second. 
@@ -130,7 +129,7 @@ This work contributes a machine learning approach that:
 	The sizing process is then straight forward:
 	\begin{itemize}
 	\item We split the opamp into the predefined subblocks.
-	\item We train a neural netork for each of the subblocks, where we use the OpAmp performance as guidance for the DDPM model and train to recover only the sizing sof the blocks
+	\item We train a neural network for each of the subblocks, where we use the OpAmp performance as guidance for the DDPM model and train to recover only the sizings of the blocks.
 	\item Finally, at evaluation time, we recombine the predicted sizings. In case of overlap of two blocks, we take the average value.
 	\end{itemize}
 	Like in the previous work, we enforce symmetry that can be automatically detected by deterministic algorithms. For symmetry within blocks, this is done during training, for symmetry outside of blocks, this is done during recombination.
@@ -216,44 +215,59 @@ This work contributes a machine learning approach that:
 		\end{figure}
 	
 \section{DDPM Background and Implementation}\label{sec:ddpm}
-	As mentioned in sec \ref{sec:intro}, several DDPMs are trained to learn the sizing and respective performances distribution of the different structures that make up the opamp. DDPMs were first introduced in \cite{ho2020denoisingdiffusionprobabilisticmodels} as a new diffusion model parametrization, which are a class of NNs mostly used in an imaging context, like data generation and restauration. These models are composed of 3 different processes, which are briefly highlighted here:
+	As mentioned in the previous sections, several DDPMs are trained to learn the sizing and respective performances distribution of the different structures that make up an OpAmp. DDPMs were first introduced in \cite{ho2020denoisingdiffusionprobabilisticmodels} as a new diffusion model parametrization, which are a class of NNs mostly used in an imaging context, like data generation and restauration. These models are composed of 3 different processes, which are briefly highlighted here:
 	
 	\subsubsection{Forward Process}
-	First, the training data $x_{t}$ is systematically destroyed by the addition of noise over $T$ sequential timesteps. This noise is sampled from a Gaussian distribution and at the end of the $T$ timesteps, the resulting training data distribution resembles itself a Gaussian distribution. This process is demonstrated by equation \ref{eq:forward}, where $\beta_{t}$ is the variance scheduler, a hyperparameter that controls how much noise is added to the data $x$ at each time timestep $t$.
+	First, the training data $x_{0}$ is systematically destroyed by the addition of noise over $T$ sequential timesteps, until a terminal distribution $x_{T}$ is reached. This noise is sampled from a Gaussian distribution and at the end of the $T$ timesteps, the resulting training data distribution resembles itself a Gaussian distribution. This process is demonstrated by equation \ref{eq:forward}, where $\beta_{t}$ is the variance scheduler, a hyperparameter that controls how much noise is added to the data $x$ at each time timestep $t$.
 	
 	\begin{equation} \label{eq:forward}
-	q(x_{t}|x_{t-1}) := \mathcal{N}(x_{t};\mu,\Sigma) := \mathcal{N}(x_{t};\sqrt{1-\beta_{t}}x_{t-1}, \beta_{t}I)
+	\begin{aligned}
+	q(x_{t}|x_{t-1}) &:= \mathcal{N}(x_{t};\mu,\Sigma) \\ &:= \mathcal{N}(x_{t};\sqrt{1-\beta_{t}}x_{t-1}, \beta_{t}I)
+	\end{aligned}
 	\end{equation}
 	
 	\subsubsection{Reverse Process}
-	After the data is destroyed at $x_{T}$, an ANN is trained to try to reverse the forward process, either by predicting the original data $x_{0}$ up front, or by predicting another value that can be used to reconstruct the original data, like the added noise, etc. This process is represented by equation \ref{eq:reverse}, where $\alpha_{t}=1-\beta_{t}$ and $\overline{\alpha}_{t}=\prod_{s=1}^{t}\alpha_{s}$.
+	After the data is destroyed until $x_{t}$, an ANN is trained to try to reverse the forward process, either by predicting the original data $x_{0}$ up front, or by predicting another value that can be used to reconstruct the original data, like the added noise, etc. This process is represented by equation \ref{eq:reverse}, where $\alpha_{t}=1-\beta_{t}$ and $\overline{\alpha}_{t}=\prod_{s=1}^{t}\alpha_{s}$.
 	
 	\begin{equation} \label{eq:reverse}
-		\rho_{\theta}(x_{t-1}|x_{t}) := \mathcal{N}(x_{t-1};\mu_{\theta}(x_{t},t),\Sigma_{\theta}(x_{t},t)) := \mathcal{N}(x_{t};\frac{1}{\sqrt{\alpha_{t}}}(x_{t}-\frac{1-\alpha_{t}}{\sqrt{1-\overline{\alpha}_{t}}}\epsilon_{\theta}(x_{t},t)),\beta_{t}I) 
+	\begin{split}
+		\rho_{\theta}(x_{t-1}|x_{t}) := \mathcal{N}(x_{t-1};\mu_{\theta}(x_{t},t),\Sigma_{\theta}(x_{t},t)) \\:= \mathcal{N}(x_{t};\frac{1}{\sqrt{\alpha_{t}}}(x_{t}-\frac{1-\alpha_{t}}{\sqrt{1-\overline{\alpha}_{t}}}\epsilon_{\theta}(x_{t},t)),\beta_{t}I) 
+	\end{split}
 	\end{equation}
 	
-	The correlation between the forward and reverse process to noise and denoise images can be seen in Fig \ref{fig:forward_reverse}.
+	The correlation between the forward and reverse process to noise and denoise images can be seen in figure \ref{fig:forward_reverse}. An overview of the training phase for the Folded-Cascode OpAmp of figure \ref{fig:simple53} can be seen in figure \ref{fig:DDPMtraining}.
 	
 	\begin{figure}[h]
 		\centering
 		\includegraphics[width=\linewidth]{figures/ForwardReverseDDPM}
 		\setlength{\abovecaptionskip}{0ex}%
 		\setlength{\belowcaptionskip}{-2ex}%
-		\caption{Correlation between forward and reverse}
+		\caption{Correlation between forward and reverse processes.}
 		\label{fig:forward_reverse}
 	\end{figure}
 	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=\linewidth]{figures/DDPMSubBlockTraining}
+		\setlength{\abovecaptionskip}{0ex}%
+		\setlength{\belowcaptionskip}{-2ex}%
+		\caption{Training phase for sizing an OpAmp. After the decomposition into sub-blocks, noise is added to the respective sizings. A DDPM is trained for each sub-block to predict the original sizing values.}
+		\label{fig:DDPMtraining}
+	\end{figure}
+	
 	\subsubsection{Sampling Process}
-	Finally, after the model is trained, the sampling process is used to generate new data. The model learned to reconstruct the original data, and so by giving it pure Gaussian noise it tries to reconstruct data. Except this time, there is no actual data in the first place, marking this a form of generative AI.
+	Finally, after the model is trained, the sampling process is used to generate new data. The model learned to reverse the forward process, and so, when giving it pure Gaussian noise, it tries to reverse the noise addition until arriving at the original data. Except this time, there is no actual data to begin with, marking this a form of generative AI. This stage is similar to the training phase shown in figure \ref{fig:DDPMtraining}, except random noise is given to the network instead of the noisy sizings.
 	
 	It was shown by \cite{eid24diffusion} that DDPMs produce interesting results when applied to the inverse sizing problem. In this work, a similar implementation is considered, with a cosine schedule for $\beta$ and classifier-free guidance \cite{ho2022classifierfreediffusionguidance}, but with 2 key differences:
 	
 	\begin{itemize}
-		\item instead of predicting the noise $\epsilon$, the implemented model predicts a velocity equation $v$ which has been shown to enable a true signal-to-noise ratio of $0$ at the last timestep $T$, removing an important discrepancy between training and inference \cite{lin2024commondiffusionnoiseschedules};
-		\item the backbone of the model implemented here is a transformer, with an architecture similar to \cite{peebles2023scalablediffusionmodelstransformers}, as opposed to the simple multi-layer perceptrons implemented by \cite{eid24diffusion}. To predict a more complex value in $v$ a stronger architecture was required.
+		\item instead of predicting the noise $\epsilon$, we implement a model that predicts a velocity equation $v=\alpha_{t}\epsilon - \sigma_{t}x$ which has been shown to enable a true signal-to-noise ratio of $0$ at the last timestep $T$ (meaning that at the last timstep the input of the model is pure Gaussian noise), as opposed to other DDPM parametrizations. This removes an important discrepancy between training and inference \cite{lin2024commondiffusionnoiseschedules};
+		\item the backbone of the model implemented  is a transformer, with an architecture similar to the "adaLN-Zero" model of  \cite{peebles2023scalablediffusionmodelstransformers}, as opposed to the simple multi-layer perceptrons implemented by \cite{eid24diffusion}. To predict a more complex value in $v$, a stronger architecture was required.
 	\end{itemize}
 	
-	\subsection{Results}
+	
+	
+	\section{Experimental Results} \label{sec:results}
 	\begin{figure}[]
 		\centering
 		\includegraphics[width=.7\linewidth]{figures/miller_pmos}

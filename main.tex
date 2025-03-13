@@ -57,7 +57,7 @@ We address those challenges by combining two state of the art machine learning a
 	However, to the best of our knowledge, none of them show strengths in all four categories, speed, accuracy, sample efficiency and exploration.
 	%In the end, all of these works suffer from lengthy training and simulation times.
 	
-	In this work, we aim for a combination of all those virtues by applying denoising diffusion probabilistic models (DDPM) to the sizing of OpAmps, utilizing the approach in \cite{leibl24inverse} of subdividing the circuits into simpler structures, which has shown high accuracy for low sample sizes. DDPMs have proven their potential for generating strongly varied, but realistic results in other fields, OpenAi's DALL-E and Stable Diffusion being among the most prominent examples. \cite{eid24diffusion} proved these model's efficacy in the inverse sizing problem.
+	In this work, we aim for a combination of all those virtues by applying denoising diffusion probabilistic models (DDPM) to the sizing of OpAmps, utilizing the approach in \cite{leibl24inverse} of subdividing the circuits into simpler structures, which has shown high accuracy for low sample sizes. DDPMs have proven their potential for generating strongly varied, but realistic results in other fields, OpenAI's DALL-E and Stable Diffusion being among the most prominent examples. \cite{eid24diffusion} proved these model's efficacy in the inverse sizing problem.
 	
 %	In this work, we explore the application of denoising diffusion probabilistic models (DDPM) to the sizing of OpAmps, utilizing the approach in \cite{leibl24inverse} of subdividing the circuits into simpler structures, and by leveraging sampled sizings from the open-source tool FUBOCO \cite{fuboco-github}. These models efficacy in the inverse sizing problem were proven in \cite{eid24diffusion}. 
 %	Each DDPM is trained on a different structure of the target circuit, learning the corresponding distribution of sizes and respective performances by the noising and denoising process. 
@@ -103,7 +103,7 @@ This work contributes a machine learning approach that:
         \includegraphics[width=\linewidth]{figures/struct_overview_incl_partition}
 		\setlength{\abovecaptionskip}{0ex}%
 		\setlength{\belowcaptionskip}{-2ex}%
-		\caption{Splitting various OpAmps into canonical building blocks with different functional characteristics and accumulating intrinsic design know-how by training each building block with random optimal samples from all available OpAmps. Indices {\color{red} $b$}, {\color{blue} $l$} and {\color{green} $t$} represent {\color{red}$bias$}, {\color{blue}$load$} and {\color{green}$transconductance$} functionality of devices. Every building block maps the overall OpAmp performance to its sizing.}
+		\caption{Splitting various OpAmps into canonical building blocks with different functional characteristics and accumulating intrinsic design know-how by training each building block with random optimal samples from all available OpAmps. Indices {\color{red} $b$}, {\color{blue} $l$} and {\color{green} $t$} represent {\color{red}$bias$}, {\color{blue}$load$} and {\color{green}$transconductance$} functionality of devices. Every building block maps the overall OpAmp performance to its sizing. Source \cite{leibl24inverse}.}
 		\label{fig:overview-structure}
 	\end{figure}
 	\setlength{\abovecaptionskip}{1ex}%
@@ -130,7 +130,7 @@ This work contributes a machine learning approach that:
 	The sizing process is then straight forward:
 	\begin{itemize}
 	\item We split the opamp into the predefined subblocks.
-	\item We train a neural netork for each of the subblocks, where we use the OpAmp performance as guidance for the DDPM model and train to recover only the sizing sof the blocks
+	\item We train a neural netork for each of the subblocks, where we use the OpAmp performance as guidance for the DDPM model and train to recover only the sizings of the respective blocks.
 	\item Finally, at evaluation time, we recombine the predicted sizings. In case of overlap of two blocks, we take the average value.
 	\end{itemize}
 	Like in the previous work, we enforce symmetry that can be automatically detected by deterministic algorithms. For symmetry within blocks, this is done during training, for symmetry outside of blocks, this is done during recombination.

@@ -41,7 +41,7 @@
 \begin{abstract}
 Quick and effortless exploration of design spaces is of major importance in the face of rapid development cycles, varying specifications and increasingly complex circuits.
 It is also well known, that the exploitation of slack in specifications by making adjustments to transistor device sizes can lead to improved yield.
-We address those challenges by combining two state of the art machine learning approaches to achieve accurate generation of optimal performance points, while also allowing for the possibility to explore nearby sizings that might lead to more robust designs. To this end, a diffusion model is combined with an algorithm, that analyzes the circuit and splits the problem into simpler subproblems. The models are tested on a set of typical operational amplifiers.
+We address those challenges by combining two state of the art machine learning approaches to achieve accurate generation of optimal performance points, while also allowing for the possibility to explore nearby sizings that might lead to more robust designs. To this end, a diffusion model is combined with an algorithm that analyzes the circuit and splits the problem into simpler subproblems. The models are tested on a set of typical operational amplifiers.
 \end{abstract}
 
 %\begin{IEEEkeywords}
@@ -49,9 +49,9 @@ We address those challenges by combining two state of the art machine learning a
 %\end{IEEEkeywords}
 
 \section{Introduction}\label{sec:intro}
-	Since the development of SPICE, the industry accepted method for designing analog circuits has not changed much. While the SPICE models keep becoming more complex \cite{gatermann22mosfet}, the approach of manual device tuning persists \cite{gielen23workshop}. Key challenges of making analog CAD tools useful in practice are robustness, ease of use and applicability to a high range of use cases. All those aspects are not easy to grasp on a fundamental level. On the other hand, machine learning approaches excel in modeling nonlinear black box phenomena. Their combination with already existing conventional techniques has a high potential to bridge remaining gaps, that prevent the adoption of tools in industry.
+	Since the development of SPICE, the industry-accepted method for designing analog circuits has not changed much. While the SPICE models keep becoming more complex \cite{gatermann22mosfet}, the approach of manual device tuning persists \cite{gielen23workshop}. Key challenges of making analog CAD tools useful in practice are robustness, ease of use and applicability to a high range of use cases. All those aspects are not easy to grasp on a fundamental level. On the other hand, machine learning approaches excel in modeling nonlinear black box phenomena. Their combination with already existing conventional techniques has a high potential to bridge remaining gaps that prevent the adoption of tools in industry.
 	
-	Analog design is inherently an inverse problem. While the calculation of performances, yield etc., is satisfactorily possible via simulation, the inverse, i.e. getting a circuit with optimal parametrization requires experience, trial and error and complex numerical routines. As shown in previous works \cite{ leibl24inverse, lourenco19pareto}, machine learning (ML) methods can be used to accurately reproduce sizings on (pareto) optimal fronts. Furthermore, it has been shown \cite{eid24diffusion} that diffusion models are well adaptable to the inverse sizing problem. Other ML based works attempted to solve this same problem. In \cite{lourenco18}, artificial neural networks (ANNs) are used to guess circuit sizings, utilizing only one ANN for modeling an entire netlist, leading to a higher learning task complexity and thus large sample sizes (in \cite{lourenco18} $16600$ or roughly $16-160 \, x$ sample sizes used in this work) are required to learn the inverse problem within a smaller performance range. In \cite{beaulieu23cascaded}, the problem is broken down into smaller tasks, and one ANN is trained to sequentially size a single device, in the same vein as \cite{leibl24inverse}, feeding the outputs of the previous ANNs to the input of the next, producing a cascade of networks that can be sorted in different ways, until an optimal order is found. The drawback is that for more complex circuits of e.g. 15 devices, optimally ordering the ANNs for sizing leads to a complexity of 15!.
+	Analog design is inherently an inverse problem. While the calculation of performances, yield etc., is satisfactorily possible via simulation, the inverse, i.e., getting a circuit with optimal parametrization, requires experience, trial and error and complex numerical routines. As shown in previous works \cite{ leibl24inverse, lourenco19pareto}, machine learning (ML) methods can be used to accurately reproduce sizings on (Pareto) optimal fronts. Furthermore, it has been shown \cite{eid24diffusion} that diffusion models are well adaptable to the inverse sizing problem. Other ML based works attempted to solve this same problem. In \cite{lourenco18}, artificial neural networks (ANNs) are used to guess circuit sizings, utilizing only one ANN for modeling an entire netlist, leading to a higher learning task complexity and thus large sample sizes (in \cite{lourenco18} $16600$ or roughly $16 \, x$ the sample of this work) are required to learn the inverse problem within a smaller performance range. In \cite{beaulieu23cascaded}, the problem is broken down into smaller tasks, and one ANN is trained to sequentially size a single device, in the same vein as \cite{leibl24inverse}, feeding the outputs of the previous ANNs to the input of the next, producing a cascade of networks that can be sorted in different ways until an optimal order is found. The drawback is that for more complex circuits of e.g. 15 devices, optimally ordering the ANNs for sizing leads to a complexity of 15!.
 	
 	Other works follow the traditional approach of tackling the direct sizing problem, treating it as an optimization problem \cite{fayazi23angel, budak23apostle, wolfe03nnmodel, hakhamaneshi23pretraining}. Reinforcement learning was also studied, with \cite{gao23rose, settaluri22reinforcement, zhang23multiagentRL}  replacing the optimizer with an artificial neural network (ANN), leading to improvements in prediction speed, accuracy, and scalability. 
 	However, to the best of our knowledge, none of them show strengths in all four categories, speed, accuracy, sample efficiency and exploration.
@@ -71,10 +71,10 @@ This work contributes a machine learning approach that:
 %	\item generate sizing solutions at push-button speed
 %	\end{itemize}
 	\begin{itemize}
-	\item can suggest valid sizings with resulting performance in the vicinity of the required metrics, allowing for exploration of sizings while still fulfilling specifications
-	\item is highly data efficient
-	\item has an accurate expectation of the generated sizings
-	\item generates sizing solutions at push-button speed
+	\item can suggest valid sizings with resulting performance in the vicinity of the required metrics, allowing for exploration of sizings while still fulfilling specifications,
+	\item is highly data efficient,
+	\item has an accurate expectation of the generated sizings,
+	\item generates sizing solutions at push-button speed.
 	\end{itemize}
 	
  	In section \ref{sec:intro2}, we provide an overview of the proposed method and its connection to structural analysis, as well as describing the sizing process in detail. In section \ref{sec:ddpm}, a short background of DDPMs and our implemented models are presented. We conclude with a presentation of results for two OpAmps, in section \ref{sec:results}.
@@ -109,7 +109,7 @@ This work contributes a machine learning approach that:
 	\setlength{\belowcaptionskip}{-3ex}%
  	\subsection{Basics of Structural and Functional Blocks}
  	As detailed in \cite{ leibl24inverse}, the method  relies on the decomposition of circuits into subcircuits, which we call structural building blocks.
- 	While the structure of the blocks is defined by their topology, i.e. the devices and their interconnections, we identify three functional properties, \textit{bias, load} or \textit{transconductance}, for each individual transistor. This leads to further discrimination among the structural blocks. But because not every combination of functional properties is useful, the total set of possible structures remains small. 
+ 	While the structure of the blocks is defined by their devices and interconnections, we identify three functional properties, \textit{bias, load} or \textit{transconductance}, for each individual transistor. This leads to further discrimination among the structural blocks. But because not every combination of functional properties is useful, the total set of possible structures remains small. 
 	All possible variants of blocks can be found in figure~\ref{fig:overview-structure}.
 	
 	An example of decomposing a Folded-Cascode OpAmp into blocks can be seen in figure~\ref{fig:simple53}. Its structural building blocks are shaded, the names annotated close by.
@@ -126,11 +126,11 @@ This work contributes a machine learning approach that:
 	\end{figure}
 	
 	In contrast to \cite{ leibl24inverse} we use a simplified version of the model. We skip the pretraining step and directly finetune the networks. Furthermore, instead of using gain boosting for sizing of $L$, we employ the same model type.
-	The sizing process is then straight forward:
+	The sizing process is then straightforward:
 	\begin{itemize}
-	\item We split the opamp into the predefined subblocks.
-	\item We train a neural network for each of the subblocks, where we use the OpAmp performance as guidance for the DDPM model and train to recover only the sizings of the blocks.
-	\item Finally, at evaluation time, we recombine the predicted sizings. In case of overlap of two blocks, we take the average value.
+	\item Split the opamp into its building blocks.
+	\item Train a neural network for each of the buidling blocks, where we use the OpAmp performance as guidance for the DDPM model and train to recover only the sizings of the blocks.
+	\item Finally, at evaluation time, recombine the predicted sizings. In case of overlap of two blocks, we take the average value.
 	\end{itemize}
 	Like in the previous work, we enforce symmetry that can be automatically detected by deterministic algorithms. For symmetry within blocks, this is done during training, for symmetry outside of blocks, this is done during recombination.
 			
@@ -215,7 +215,7 @@ This work contributes a machine learning approach that:
 %		\end{figure}
 	
 \section{DDPM Background and Implementation}\label{sec:ddpm}
-	Several DDPMs are trained to learn the sizing and respective performances distribution of the different structures that make up an OpAmp. DDPMs were first introduced in \cite{ho2020denoisingdiffusionprobabilisticmodels} as a new diffusion model parametrization, which are a class of NNs mostly used in an imaging context, like data generation and restauration. These models are composed of 3 different processes, which are briefly highlighted here:
+	Several DDPMs are trained to learn the sizing and respective performance distribution of the different building blocks that make up an OpAmp. DDPMs were first introduced in \cite{ho2020denoisingdiffusionprobabilisticmodels} as a new diffusion model parametrization, which are a class of NNs mostly used in an imaging context, like data generation and restauration. These models are composed of 3 different processes, which are briefly highlighted here:
 	
 	\subsubsection{Forward Process}
 	First, the training data $x_{0}$ is systematically destroyed by the addition of noise over $T$ sequential timesteps, until a terminal distribution $x_{T}$ is reached. This noise is sampled from a Gaussian distribution and at the end of the $T$ timesteps, the resulting training data distribution resembles itself a Gaussian distribution. This process is demonstrated by equation \ref{eq:forward}, where $\beta_{t}$ is the variance scheduler, a hyperparameter that controls how much noise is added to the data $x$ at each time timestep $t$.
@@ -358,7 +358,7 @@ This work contributes a machine learning approach that:
 	
 	
 \section{Conclusion}
-	We have shown a a machine learning approach to not only reproduce optimal sizings for a given specification, but also helps to explore points in the nearby performance space. In the scenario of sampling multiple times for the same specification, the sampling can be interpreted as adding random noise to the ground truth sizing. The model learns the corresponding covariance matrix. As the standard deviation is not equal for all devices, this behaviour can not mimicked by simply adding noise to an optimal sizing.
+	We have shown a machine learning approach to not only reproduce optimal sizings for a given specification, but also to explore points in the nearby performance space. In the scenario of sampling multiple times for the same specification, the sampling can be interpreted as adding random noise to the ground truth sizing. The model learns the corresponding covariance matrix. As the standard deviation is not equal for all devices, this behaviour can not be mimicked by simply adding noise to an optimal sizing.
 
 \bibliographystyle{IEEEtran}
 \bibliography{IEEEabrv,bibtex-base-iee}

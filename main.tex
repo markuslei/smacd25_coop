@@ -11,6 +11,7 @@
 \usepackage{textcomp}
 \usepackage{booktabs}
 \usepackage{xcolor}
+
 %\usepackage{xcolor}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
@@ -57,9 +58,9 @@ We address those challenges by combining two state-of-the-art machine learning a
 \section{Introduction}\label{sec:intro}
 	Since the development of SPICE, the industry-accepted method for designing analog circuits has not changed much. While the SPICE models keep becoming more complex \cite{gatermann22mosfet}, the approach of manual device tuning persists \cite{gielen23workshop}. Key challenges of making analog CAD tools useful in practice are robustness, ease of use and applicability to a high range of use cases. All those aspects are not easy to grasp on a fundamental level. On the other hand, machine learning (ML) approaches excel in modeling nonlinear black box phenomena. Their combination with already existing conventional techniques has a high potential to bridge remaining gaps that prevent the adoption of tools in industry.
 	
-	Analog design is inherently an inverse problem. While the calculation of performances, yield etc., is satisfactorily possible via simulation, the inverse, i.e., getting a circuit with optimal parametrization, requires experience, trial and error and complex numerical routines. As shown in previous works \cite{ leibl24inverse, lourenco19pareto}, machine learning (ML) methods can be used to accurately reproduce sizings on (Pareto) optimal fronts. Furthermore, it has been shown \cite{eid24diffusion} that diffusion models are well adaptable to the inverse sizing problem. Other ML based works attempted to solve this same problem. In \cite{lourenco18}, artificial neural networks (ANNs) are used to guess circuit sizings, utilizing only one ANN for modeling an entire netlist, leading to a higher learning task complexity and thus large sample sizes (in \cite{lourenco18} $16600$ or roughly $16 \, x$ the sample of this work) are required to learn the inverse problem within a smaller performance range. In \cite{beaulieu23cascaded}, the problem is broken down into smaller tasks, and one ANN is trained to sequentially size a single device, in the same vein as \cite{leibl24inverse}, feeding the outputs of the previous ANNs to the input of the next, producing a cascade of networks that can be sorted in different ways until an optimal order is found. The drawback is that for more complex circuits of, e.g., 15 devices, optimally ordering the ANNs for sizing leads to a complexity of 15!.
+	Analog design is inherently an inverse problem. While the calculation of performances, yield etc., is satisfactorily possible via simulation, the inverse, i.e., getting a circuit with optimal parametrization, requires experience, trial and error and complex numerical routines. As shown in previous works \cite{ leibl24inverse, lourenco19pareto}, machine learning (ML) methods can be used to accurately reproduce sizings on (Pareto) optimal fronts. Furthermore, it has been shown \cite{eid24diffusion} that diffusion models are well adaptable to the inverse sizing problem. Other ML based works attempted to solve this same problem. In \cite{lourenco18}, artificial neural networks (ANNs) are used to guess circuit sizings, utilizing only one ANN for modeling an entire netlist, leading to a higher learning task complexity and thus large sample sizes are required to learn the inverse problem within a smaller performance range. In \cite{beaulieu23cascaded}, the problem is broken down into smaller tasks, and one ANN is trained to sequentially size a single device, in the same vein as \cite{leibl24inverse}, feeding the outputs of the previous ANNs to the input of the next, producing a cascade of networks that can be sorted in different ways until an optimal order is found. The drawback is that for more complex circuits of, e.g., 15 devices, optimally ordering the ANNs for sizing leads to a complexity of 15!.
 	
-	Other works follow the traditional approach of tackling the direct sizing problem, treating it as an optimization problem \cite{fayazi23angel, budak23apostle, wolfe03nnmodel, hakhamaneshi23pretraining}. Reinforcement learning was also studied, with \cite{gao23rose, settaluri22reinforcement, zhang23multiagentRL}  replacing the optimizer with an ANN, leading to improvements in prediction speed, accuracy, and scalability. 
+	Other works follow the traditional approach of tackling the direct sizing problem, treating it as an optimization problem \cite{fayazi23angel, budak23apostle, wolfe03nnmodel, hakhamaneshi23pretraining}. In \cite{leibl24initial} it is shown that starting points chosen via a simpler device model greatly reduce the necessary time for optimization. Reinforcement learning was also studied, with \cite{settaluri22reinforcement, zhang23multiagentRL}  replacing the optimizer with an ANN, leading to improvements in prediction speed, accuracy, and scalability. 
 	However, to the best of our knowledge, none of them show strengths in all four categories, speed, accuracy, sample efficiency and exploration.
 	
 	In this work, we aim for a combination of all those virtues by applying denoising diffusion probabilistic models (DDPM) to the sizing of OpAmps, utilizing the approach in \cite{leibl24inverse} of subdividing the circuits into simpler structures, which has shown high accuracy for low sample sizes. DDPMs have proven their potential for generating strongly varied, but realistic results in other fields, OpenAI's DALL-E and Stable Diffusion being among the most prominent examples. As stated, \cite{eid24diffusion} proved these model's efficacy in the inverse sizing problem.
@@ -202,7 +203,7 @@ This work contributes a ML approach that:
 			\label{fig:boxplotmiller}
 		\end{subfigure}
 		\setlength{\abovecaptionskip}{3ex}%
-		\setlength{\belowcaptionskip}{-3ex}%
+		\setlength{\belowcaptionskip}{-4ex}%
 		%			\caption{Folded Cascode OpAmp (\ref{fig:simple53}) and process of transfer learning (\ref{fig:fine-tuning}): Instead of training one huge network per OpAmp, we can use weights from our database as initial training points to merely fine-tune our networks }
 		\caption{Boxplots of the percentage of differences in performances for the test set of both tested OpAmps, after removal of outliers. The innermost line represents the median, the box $50\%$ of the data. }
 		\label{fig:boxplots}
@@ -217,6 +218,7 @@ This work contributes a ML approach that:
 	
 	In a second experiment we sampled the model for the FCOA $100$ times, while keeping the same performance specification. The results can be seen in fig.~\ref{fig:histograms53} and table~\ref{tab:device_stats}. Most distributions in the performance space in fig.~\ref{fig:histograms53} exhibit a gaussian behaviour, centered around the ground truth performance marked by a red star. Table~\ref{tab:device_stats} indicates that the model learns to estimate the different contributions and sensitivities for the individual parameters. It can be seen that the standard deviation varies heavily depending on the device, indicating that the model learns to scale the effects of parameter deviations.
 
+	\setlength{\textfloatsep}{0.4cm}
 	\begin{table}[]
 %		\tiny
 		\centering
@@ -246,16 +248,17 @@ This work contributes a ML approach that:
 		14 & $244.11$ & $13.0$ \\
 		\bottomrule
 		\end{tabular}
-		\vspace{-1cm}
+		\vspace{-5cm}
+		
 		}\end{table}
 		
-		
+%	\setlength{\textfloatsep}{0.6cm}
 	\begin{figure}[]
 		\centering
 		\includegraphics[width=\linewidth]{figures/histograms_simple53_100samples}
 %		\setlength{\abovecaptionskip}{0ex}%
 %		\setlength{\belowcaptionskip}{-2ex}%
-		\caption{Histograms for $100$ samples of the trained FCOA model with the \textbf{same} performance specification. Most distributions are well shaped around the ground truth from the test set. The performance value of the ground truth sizing is marked by a red star.}
+		\caption{Histograms for $100$ samples of the trained FCOA model with \textbf{same} performance specification. Most distributions are well shaped around the ground truth from the test set. A red star marks the performance value of the ground truth sizing.}
 		\label{fig:histograms53}
 	\end{figure}
 	

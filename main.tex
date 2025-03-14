@@ -19,12 +19,12 @@
 %\setlength\textfloatsep{5pt}  % separation of floats on bottom or top of page
 %\setlength\intextsep{5pt}  % separation of floats inbetween text
 
-\title{Inverse Sizing and Exploration Based on Diffusion Models and Structural Knowledge
-\thanks{Filipe Azevedo and Ricardo Martins are with ..., (email) Markus Leibl and Helmut Graeb are with Technical University of Munich, Chair of Electronic Design Automation (email: markus.leibl@tum.de, helmut.graeb@tum.de).\\
+\title{Inverse Analog IC Sizing and Exploration through Diffusion Models and Structural Knowledge
+\thanks{Filipe Azevedo and Ricardo Martins are with Instituto de Telecomunicações and Instituto Superior Técnico - Universidade de Lisboa, (email: filipepazevedo@gmail.com, ricmartins@lx.it.pt). Markus Leibl and Helmut Graeb are with Technical University of Munich, Chair of Electronic Design Automation (email: markus.leibl@tum.de, helmut.graeb@tum.de).\\
 \textit{* Both authors contributed equally to this work.}\\
-Parts of this work have been done within the collaborative project HoLoDEC funded by the Federal Ministry of Education and Research Germany (BMBF) under the funding code 16ME0705.}}
+Parts of this work have been done within the collaborative project HoLoDEC funded by the Federal Ministry of Education and Research Germany (BMBF) under the funding code 16ME0705. and also funded by Fundação para a Ciência e Tecnologia – Ministério da Ciência, Tecnologia e Ensino Superior (FCT/MCTES) through national funds and, when applicable cofounded by European Union (EU) funds under the projects UIDB/50008/2020 (DOI identifier 10.54499/UIDB/50008/2020), ACTON (DOI identifier 10.54499/2023.11981.PEX), and also, by Sony Semiconductor Solutions (project GENERALISE).}}
 
-\author{Filipe Azevedo* , Markus Leibl*, Helmut Graeb and Ricardo Martins}
+\author{Filipe Azevedo*, Markus Leibl*, Ricardo Martins and Helmut Graeb}
 
 %\author{\IEEEauthorblockN{Markus Leibl}
 %\IEEEauthorblockA{
@@ -47,7 +47,7 @@ Parts of this work have been done within the collaborative project HoLoDEC funde
 \begin{abstract}
 In the realm of analog integrated circuit sizing, quick and effortless exploration of design spaces is of major importance in the face of rapid development cycles, varying specifications and increasingly complex circuits.
 It is also well known, that the exploitation of slack in specifications by making adjustments to transistor device sizes can lead to improved yield.
-We address those challenges by combining two state of the art machine learning approaches to achieve accurate generation of optimal performance points, while also allowing for the possibility to explore nearby sizings that might lead to more robust designs. To this end, a diffusion model is combined with an algorithm that analyzes the circuit and splits the problem into simpler subproblems. The models are tested on a set of typical operational amplifiers.
+We address those challenges by combining two state-of-the-art machine learning approaches to achieve accurate generation of optimal performance points, while also allowing for the possibility to explore nearby sizings that might lead to more robust designs. To this end, a diffusion model is combined with an algorithm that analyzes the circuit and splits the problem into simpler subproblems. The models are tested on a set of typical operational amplifiers.
 \end{abstract}
 
 %\begin{IEEEkeywords}
@@ -55,21 +55,21 @@ We address those challenges by combining two state of the art machine learning a
 %\end{IEEEkeywords}
 
 \section{Introduction}\label{sec:intro}
-	Since the development of SPICE, the industry-accepted method for designing analog circuits has not changed much. While the SPICE models keep becoming more complex \cite{gatermann22mosfet}, the approach of manual device tuning persists \cite{gielen23workshop}. Key challenges of making analog CAD tools useful in practice are robustness, ease of use and applicability to a high range of use cases. All those aspects are not easy to grasp on a fundamental level. On the other hand, machine learning approaches excel in modeling nonlinear black box phenomena. Their combination with already existing conventional techniques has a high potential to bridge remaining gaps that prevent the adoption of tools in industry.
+	Since the development of SPICE, the industry-accepted method for designing analog circuits has not changed much. While the SPICE models keep becoming more complex \cite{gatermann22mosfet}, the approach of manual device tuning persists \cite{gielen23workshop}. Key challenges of making analog CAD tools useful in practice are robustness, ease of use and applicability to a high range of use cases. All those aspects are not easy to grasp on a fundamental level. On the other hand, machine learning (ML) approaches excel in modeling nonlinear black box phenomena. Their combination with already existing conventional techniques has a high potential to bridge remaining gaps that prevent the adoption of tools in industry.
 	
-	Analog design is inherently an inverse problem. While the calculation of performances, yield etc., is satisfactorily possible via simulation, the inverse, i.e., getting a circuit with optimal parametrization, requires experience, trial and error and complex numerical routines. As shown in previous works \cite{ leibl24inverse, lourenco19pareto}, machine learning (ML) methods can be used to accurately reproduce sizings on (Pareto) optimal fronts. Furthermore, it has been shown \cite{eid24diffusion} that diffusion models are well adaptable to the inverse sizing problem. Other ML based works attempted to solve this same problem. In \cite{lourenco18}, artificial neural networks (ANNs) are used to guess circuit sizings, utilizing only one ANN for modeling an entire netlist, leading to a higher learning task complexity and thus large sample sizes (in \cite{lourenco18} $16600$ or roughly $16 \, x$ the sample of this work) are required to learn the inverse problem within a smaller performance range. In \cite{beaulieu23cascaded}, the problem is broken down into smaller tasks, and one ANN is trained to sequentially size a single device, in the same vein as \cite{leibl24inverse}, feeding the outputs of the previous ANNs to the input of the next, producing a cascade of networks that can be sorted in different ways until an optimal order is found. The drawback is that for more complex circuits of e.g. 15 devices, optimally ordering the ANNs for sizing leads to a complexity of 15!.
+	Analog design is inherently an inverse problem. While the calculation of performances, yield etc., is satisfactorily possible via simulation, the inverse, i.e., getting a circuit with optimal parametrization, requires experience, trial and error and complex numerical routines. As shown in previous works \cite{ leibl24inverse, lourenco19pareto}, machine learning (ML) methods can be used to accurately reproduce sizings on (Pareto) optimal fronts. Furthermore, it has been shown \cite{eid24diffusion} that diffusion models are well adaptable to the inverse sizing problem. Other ML based works attempted to solve this same problem. In \cite{lourenco18}, artificial neural networks (ANNs) are used to guess circuit sizings, utilizing only one ANN for modeling an entire netlist, leading to a higher learning task complexity and thus large sample sizes (in \cite{lourenco18} $16600$ or roughly $16 \, x$ the sample of this work) are required to learn the inverse problem within a smaller performance range. In \cite{beaulieu23cascaded}, the problem is broken down into smaller tasks, and one ANN is trained to sequentially size a single device, in the same vein as \cite{leibl24inverse}, feeding the outputs of the previous ANNs to the input of the next, producing a cascade of networks that can be sorted in different ways until an optimal order is found. The drawback is that for more complex circuits of, e.g., 15 devices, optimally ordering the ANNs for sizing leads to a complexity of 15!.
 	
-	Other works follow the traditional approach of tackling the direct sizing problem, treating it as an optimization problem \cite{fayazi23angel, budak23apostle, wolfe03nnmodel, hakhamaneshi23pretraining}. Reinforcement learning was also studied, with \cite{gao23rose, settaluri22reinforcement, zhang23multiagentRL}  replacing the optimizer with an artificial neural network (ANN), leading to improvements in prediction speed, accuracy, and scalability. 
+	Other works follow the traditional approach of tackling the direct sizing problem, treating it as an optimization problem \cite{fayazi23angel, budak23apostle, wolfe03nnmodel, hakhamaneshi23pretraining}. Reinforcement learning was also studied, with \cite{gao23rose, settaluri22reinforcement, zhang23multiagentRL}  replacing the optimizer with an ANN, leading to improvements in prediction speed, accuracy, and scalability. 
 	However, to the best of our knowledge, none of them show strengths in all four categories, speed, accuracy, sample efficiency and exploration.
 	
-	In this work, we aim for a combination of all those virtues by applying denoising diffusion probabilistic models (DDPM) to the sizing of OpAmps, utilizing the approach in \cite{leibl24inverse} of subdividing the circuits into simpler structures, which has shown high accuracy for low sample sizes. DDPMs have proven their potential for generating strongly varied, but realistic results in other fields, OpenAI's DALL-E and Stable Diffusion being among the most prominent examples. \cite{eid24diffusion} proved these model's efficacy in the inverse sizing problem.
+	In this work, we aim for a combination of all those virtues by applying denoising diffusion probabilistic models (DDPM) to the sizing of OpAmps, utilizing the approach in \cite{leibl24inverse} of subdividing the circuits into simpler structures, which has shown high accuracy for low sample sizes. DDPMs have proven their potential for generating strongly varied, but realistic results in other fields, OpenAI's DALL-E and Stable Diffusion being among the most prominent examples. As stated, \cite{eid24diffusion} proved these model's efficacy in the inverse sizing problem.
 	
-	Unlike most machine learning models, DDPMs can suggest different sizings for the same problem by repeatedly sampling them.
+	Unlike most ML models, DDPMs can suggest different sizings for the same problem by repeatedly sampling them.
 	As shown in Section IV, this approach to the inverse problem can produce a more varied set of possible sizings, which is very helpful when exploring sizing options in the vicinity of performance optima. 
-This work contributes a machine learning approach that:
+This work contributes a ML approach that:
 	\begin{itemize}
-	\item can suggest valid sizings with resulting performance in the vicinity of the required metrics, allowing for exploration of sizings while still fulfilling specifications,
-	\item is highly data efficient,
+	\item can suggest valid sizings with resulting performance in the vicinity of the required metrics, allowing for exploration of sizings in order to pursue further optimal performance regions, while still fulfilling specifications,
+	\item is highly data efficient, requiring a fraction of the dataset size used in \cite{eid24diffusion} and \cite{lourenco18},
 	\item has an accurate expectation of the generated sizings,
 	\item generates sizing solutions at push-button speed.
 	\end{itemize}
@@ -91,9 +91,9 @@ This work contributes a machine learning approach that:
  	\subsection{Basics of Structural and Functional Blocks}
  	As detailed in \cite{ leibl24inverse}, the method  relies on the decomposition of circuits into subcircuits, which we call structural building blocks.
  	While the structure of the blocks is defined by their devices and interconnections, we identify three functional properties, \textit{bias, load} or \textit{transconductance}, for each individual transistor. This leads to further discrimination among the structural blocks. But because not every combination of functional properties is useful, the total set of possible structures remains small. 
-	All possible variants of blocks can be found in figure~\ref{fig:overview-structure}.
+	All possible variants of blocks can be found in fig.~\ref{fig:overview-structure}.
 	
-	An example of decomposing a Folded-Cascode OpAmp (FCOA) into blocks can be seen in figure~\ref{fig:simple53}. Its structural building blocks are shaded, the names annotated close by.
+	An example of decomposing a Folded-Cascode OpAmp (FCOA) into blocks can be seen in fig.~\ref{fig:simple53}. Its structural building blocks are shaded, the names annotated close by.
 	Structural and functional block recognition is fully automated. The time required for this is much less than one second. 
 	
 \subsection{Overview of the Method}
@@ -109,16 +109,17 @@ This work contributes a machine learning approach that:
 	In contrast to \cite{ leibl24inverse} we use a simplified version of the model. We skip the pretraining step and directly finetune the networks. Furthermore, instead of using gain boosting for sizing of $L$, we employ the same model type.
 	The sizing process is then straightforward:
 	\begin{itemize}
-	\item Split the opamp into its building blocks.
-	\item Train a neural network for each of the buidling blocks, where we use the OpAmp performance as guidance for the DDPM model and train to recover only the sizings of the blocks.
-	\item Finally, at evaluation time, recombine the predicted sizings. In case of overlap of two blocks, we take the average value.
+	\item split the opamp into its building blocks.
+	\item train a neural network for each of the buidling blocks, where we use the OpAmp performance as guidance for the DDPM model and train to recover only the sizings of the blocks.
+	\item finally, at evaluation time, recombine the predicted sizings. In case of overlap of two blocks, we take the average value.
 	\end{itemize}
+
 	Like in the previous work, we enforce symmetry that can be automatically detected by deterministic algorithms. For symmetry within blocks, this is done during training, for symmetry outside of blocks, this is done during recombination.
 			
 
 	
 \section{DDPM Background and Implementation}\label{sec:ddpm}
-	Several DDPMs are trained to learn the sizing and respective performance distribution of the different building blocks that make up an OpAmp. DDPMs were first introduced in \cite{ho2020denoisingdiffusionprobabilisticmodels} as a new diffusion model parametrization, which are a class of NNs mostly used in an imaging context, like data generation and restauration. These models are composed of 3 different processes, which are briefly highlighted here:
+	Several DDPMs are trained to learn the sizing and respective performance distribution of the different building blocks that make up an OpAmp. DDPMs were first introduced in \cite{ho2020denoisingdiffusionprobabilisticmodels} as a new diffusion model parametrization, which are a class of ANNs mostly used in an imaging context, like data generation and restauration. These models are composed of 3 different processes, which are briefly highlighted here:
 	
 	\subsubsection{Forward Process}
 	First, the training data $x_{0}$ is systematically destroyed by the addition of noise over $T$ sequential steps, in the literature called timesteps, until a terminal distribution $x_{T}$ is reached. This noise is sampled from a Gaussian distribution and at the end of the $T$ timesteps, the resulting training data distribution resembles itself a Gaussian distribution. %For example, if $T=10$ then noise is sampled at each timestep and added to the data $10$ times. 
@@ -160,13 +161,13 @@ This work contributes a machine learning approach that:
 	\end{figure}
 	
 	\subsubsection{Sampling Process}
-	Finally, after the model is trained, the sampling process is used to generate new data. The model learned to reverse the forward process, and so, when giving it pure Gaussian noise, it tries to reverse the noise addition until arriving at the original data. Except this time, there is no actual data to begin with, marking this a form of generative AI. This stage is similar to the training phase shown in figure \ref{fig:DDPMtraining}, except random noise is given as input to the network instead of the noisy sizings.
+	Finally, after the model is trained, the sampling process is used to generate new data. The model learned to reverse the forward process, and so, when giving it pure Gaussian noise, it tries to reverse the noise addition until arriving at the original data. Except this time, there is no actual data to begin with, marking this a form of generative artificial intelligence. This stage is similar to the training phase shown in fig. \ref{fig:DDPMtraining}, except random noise is given as input to the network instead of the noisy sizings.
 	
 	It was shown by \cite{eid24diffusion} that DDPMs produce interesting results when applied to the inverse sizing problem. In this work, a similar implementation is considered, with a cosine schedule for $\beta$ and classifier-free guidance \cite{ho2022classifierfreediffusionguidance}, but with 2 key differences:
 	
 	\begin{itemize}
 		\item instead of predicting the noise $\epsilon$, we implement a model that predicts a velocity equation $v_{t}=\alpha_{t}\epsilon - \sigma_{t}x$ which has been shown to enable a true signal-to-noise ratio of $0$ at the last timestep $T$ (meaning that at the last timstep the input of the model is pure Gaussian noise), as opposed to other DDPM parametrizations. This removes an important discrepancy between training and inference \cite{lin2024commondiffusionnoiseschedules};
-		\item the backbone of the model implemented  is a transformer, with an architecture similar to the "adaLN-Zero" model of  \cite{peebles2023scalablediffusionmodelstransformers}, as opposed to the simple multi-layer perceptrons implemented by \cite{eid24diffusion}. To predict a more complex value in $v$, a stronger architecture was required.
+		\item the backbone of the model implemented  is a transformer, with an architecture similar to the ``adaLN-Zero'' model of  \cite{peebles2023scalablediffusionmodelstransformers}, as opposed to the simple multi-layer perceptrons implemented by \cite{eid24diffusion}. To predict a more complex value in $v$, a stronger architecture was required.
 	\end{itemize}
 	
 	
@@ -188,7 +189,7 @@ This work contributes a machine learning approach that:
 			\setlength{\abovecaptionskip}{0ex}%
 			%		\setlength{\belowcaptionskip}{-2ex}%
 			\setlength{\belowcaptionskip}{0ex}%
-			\caption{Folded-Cascode OpAmp.}
+			\caption{FCOA.}
 			\label{fig:boxplotfca}
 		\end{subfigure}
 		\hfill
@@ -197,7 +198,7 @@ This work contributes a machine learning approach that:
 			\includegraphics[width=\linewidth]{figures/BoxplotMillerOpAmp}
 			\setlength{\abovecaptionskip}{-0.5ex}%
 			%		\setlength{\belowcaptionskip}{-2ex}%
-			\caption{Miller OpAmp.}
+			\caption{MOA.}
 			\label{fig:boxplotmiller}
 		\end{subfigure}
 		\setlength{\abovecaptionskip}{3ex}%
@@ -208,20 +209,20 @@ This work contributes a machine learning approach that:
 	\end{figure}
 	
 
-	We trained our approach on two different OpAmps, a Folded-Cascode OpAmp (FCOA) previously studied in \cite{leibl24inverse} shown in figure \ref{fig:simple53} and the Miller OpAmp in figure \ref{fig:miller}. After training, we sampled the models for all ground truth sizings in the test sets of both OpAmps, corresponding to 118 for the FCOA and 77 for the Miller OpAmp. After simulating the sampled values, the resulting performances were compared with simulations of the ground truth values. 
+	We trained our approach on two different OpAmps, the FCOA previously studied in \cite{leibl24inverse} shown in fig. \ref{fig:simple53} and the Miller OpAmp (MOA) in fig. \ref{fig:miller}. After training, we sampled the models for all ground truth sizings in the test sets of both OpAmps, corresponding to 118 for the FCOA and 77 for the Miller OpAmp. After simulating the sampled values, the resulting performances were compared with simulations of the ground truth values. 
 	All models have been trained with a sample size between $700$ and $1000$ elements. While slightly less efficient as \cite{leibl24inverse}, the price for added flexibility, the sample sizes are very low.
 	
 	Boxplots of the relative performance differences are presented in fig.~\ref{fig:boxplots}, bar outliers.
-	For the FCOA in fig.~\ref{fig:boxplotfca}, most boxes are centered around 0 (i.e. the ground truth), but some performances show a tendency of improvement. For Power, ICMR\textsubscript{min} and Vout\textsubscript{min} median and box extend downwards (the predictions' performances are lower than the labels), while Gain and Transit Frequency median and box extend upwards (the predictions' performances are greater than the ground truth sizings). Similar observations can be made for the Miller OpAmp in fig.~\ref{fig:boxplotmiller}, with the CMRR and Slew Rate having the biggest improvement. Here, the only performance that showed a tendency toward deterioration was Power. This shows that the models are able to accurately learn the distribution of the circuits' sizing and respective performances, sometimes finding interesting improvements that might be attributed to learned trade-offs between sizes of the different sub-blocks.
+	For the FCOA in fig.~\ref{fig:boxplotfca}, most boxes are centered around 0 (i.e. the ground truth), but some performances show a tendency of improvement. For Power, ICMR\textsubscript{min} and Vout\textsubscript{min} median and box extend downwards (the predictions' performances are lower than the labels), while Gain and Transit Frequency median and box extend upwards (the predictions' performances are greater than the ground truth sizings). Similar observations can be made for the MOA in fig.~\ref{fig:boxplotmiller}, with the CMRR and Slew Rate having the biggest improvement. Here, the only performance that showed a tendency toward deterioration was Power. This shows that the models are able to accurately learn the distribution of the circuits' sizing and respective performances, sometimes finding interesting improvements that might be attributed to learned trade-offs between sizes of the different sub-blocks.
 	
-	In a second experiment we sampled the model for the FCOA $100$ times, while keeping the same performance specification. The results can be seen in figure~\ref{fig:histograms53} and table~\ref{tab:device_stats}. Most distributions in the performance space in fig.~\ref{fig:histograms53} exhibit a gaussian behaviour, centered around the ground truth performance marked by a red star. Table~\ref{tab:device_stats} indicates that the model learns to estimate the different contributions and sensitivities for the individual parameters. 
+	In a second experiment we sampled the model for the FCOA $100$ times, while keeping the same performance specification. The results can be seen in fig.~\ref{fig:histograms53} and table~\ref{tab:device_stats}. Most distributions in the performance space in fig.~\ref{fig:histograms53} exhibit a gaussian behaviour, centered around the ground truth performance marked by a red star. Table~\ref{tab:device_stats} indicates that the model learns to estimate the different contributions and sensitivities for the individual parameters. It can be seen that the standard deviation varies heavily depending on the device, indicating that the model learns to scale the effects of parameter deviations.
 
 	\begin{table}[]
 %		\tiny
 		\centering
 		\setlength{\abovecaptionskip}{0ex}%
 		\setlength{\belowcaptionskip}{2ex}%
-		\caption{Estimated mean value and standard deviation of W parameter sizes of the FCOA for 100 samples and same performance specification. It can be seen that the standard deviation varies heavily depending on the device. It appears that the model learns to scale the effects of parameter deviations.}
+		\caption{Estimated mean value and standard deviation of W parameter sizes of the FCOA for 100 samples and same performance specification.}
 		\label{tab:device_stats}
 		\resizebox{.6\linewidth}{!}{
 		\begin{tabular}{lll}

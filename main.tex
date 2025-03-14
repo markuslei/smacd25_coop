@@ -242,7 +242,7 @@ This work contributes a machine learning approach that:
 		\includegraphics[width=\linewidth]{figures/ForwardReverseDDPM}
 		\setlength{\abovecaptionskip}{0ex}%
 		\setlength{\belowcaptionskip}{-2ex}%
-		\caption{Correlation between forward and reverse processes.}
+		\caption{Correlation between forward and reverse processes \cite{eid24diffusion}.}
 		\label{fig:forward_reverse}
 	\end{figure}
 	
@@ -303,9 +303,9 @@ This work contributes a machine learning approach that:
 		\label{fig:boxplots}
 	\end{figure}
 	
-	We trained our approach on two different OpAmps. One is the Folded-Cascode OpAmp that was previously studied in \cite{leibl24inverse} and whose topology can be seen in figure \ref{fig:simple53}. The other is the Miller OpAmp that is detailed in figure \ref{fig:miller}. After training, we sampled the models for sizings of each entry in the test set of both OpAmps, which corresponded to 118 for the Folded-Cascode and 77 for the Miller OpAmp. After simulating the sampled values, the resulting performances were compared with the originals and boxplots of the differences are presented in figure \ref{fig:boxplots}, after the removing of some outliers. However, it is important to note that all results were simulatable. 
+	We trained our approach on two different OpAmps. One is the Folded-Cascode OpAmp that was previously studied in \cite{leibl24inverse} and whose topology can be seen in figure \ref{fig:simple53}. The other is the Miller OpAmp that is detailed in figure \ref{fig:miller}. The dataset for both OpAmps was composed of sizings and respective performances. After training, the models were sampled for sizings of each entry in the test set of both OpAmps, which corresponded to 118 for the Folded-Cascode and 77 for the Miller OpAmp. After simulating the sampled values, the resulting performances were compared with the originals and boxplots of the differences are presented in figure \ref{fig:boxplots}, after the removing of some outliers. However, it is important to note that all results were simulatable. 
 	
-	After careful analysis, for the Folded-Cascode OpAmp in figure \ref{fig:boxplotfca}, the boxes are centered around 0, but some performances show a tendency of improvement, like the Power, ICMR\textsubscript{min} and Vout\textsubscript{min} which extend downwards (meaning the predictions' performances are lower than the labels), while Gain and Transit Frequency extend upwards (meaning the predictions' performances are greater than the labels). The same can be said for the Miller OpAmp \ref{fig:boxplotmiller}, with the CMRR and Slew Rate having the biggest improvement. The only performance that had a deterioration was the Power. This shows that the models are able to accurately learn the distribution of the circuits' sizing and respective performances, sometimes finding interesting improvements that can be attributed to learned trade-offs between sizes of the different sub-blocks.
+	After careful analysis, for the Folded-Cascode OpAmp in figure \ref{fig:boxplotfca}, the boxes are centered around 0, but some performances show a tendency of improvement, like the Power, ICMR\textsubscript{min} and Vout\textsubscript{min} which extend downwards (meaning the predictions' performances are lower than the true value), while Gain and Transit Frequency extend upwards (meaning the predictions' performances are greater than the true labels). The same can be said for the Miller OpAmp detailed in figure \ref{fig:boxplotmiller}, with the CMRR and Slew Rate having the biggest improvement. The only performance that had a deterioration was the Power. This shows that the models are able to accurately learn the distribution of the circuits' sizing and respective performances, sometimes finding interesting improvements that can be attributed to learned trade-offs between sizes of the different sub-blocks.
 	
 	
 \section{Conclusion}

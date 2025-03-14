@@ -55,21 +55,12 @@ We address those challenges by combining two state of the art machine learning a
 	
 	Other works follow the traditional approach of tackling the direct sizing problem, treating it as an optimization problem \cite{fayazi23angel, budak23apostle, wolfe03nnmodel, hakhamaneshi23pretraining}. Reinforcement learning was also studied, with \cite{gao23rose, settaluri22reinforcement, zhang23multiagentRL}  replacing the optimizer with an artificial neural network (ANN), leading to improvements in prediction speed, accuracy, and scalability. 
 	However, to the best of our knowledge, none of them show strengths in all four categories, speed, accuracy, sample efficiency and exploration.
-	%In the end, all of these works suffer from lengthy training and simulation times.
 	
 	In this work, we aim for a combination of all those virtues by applying denoising diffusion probabilistic models (DDPM) to the sizing of OpAmps, utilizing the approach in \cite{leibl24inverse} of subdividing the circuits into simpler structures, which has shown high accuracy for low sample sizes. DDPMs have proven their potential for generating strongly varied, but realistic results in other fields, OpenAI's DALL-E and Stable Diffusion being among the most prominent examples. \cite{eid24diffusion} proved these model's efficacy in the inverse sizing problem.
 	
-%	In this work, we explore the application of denoising diffusion probabilistic models (DDPM) to the sizing of OpAmps, utilizing the approach in \cite{leibl24inverse} of subdividing the circuits into simpler structures, and by leveraging sampled sizings from the open-source tool FUBOCO \cite{fuboco-github}. These models efficacy in the inverse sizing problem were proven in \cite{eid24diffusion}. 
-%	Each DDPM is trained on a different structure of the target circuit, learning the corresponding distribution of sizes and respective performances by the noising and denoising process. 
-%	After training, the DDPMs can be sampled to generate sizing values for each structure, which when combined make up the whole sizing solution of the target OpAmp. 
 	Unlike most machine learning models, DDPMs can suggest different sizings for the same problem by repeatedly sampling them.
 	As shown in Section IV, this approach to the inverse problem can produce a more varied set of possible sizings, which is very helpful when exploring sizing options in the vicinity of performance optima. 
-%	The contributions of this work are as follows: 
 This work contributes a machine learning approach that:
-%	\begin{itemize}
-%	\item suggest valid sizings that perform in the vicinity of the required metrics, allowing for exploration of a sizing area of interest
-%	\item generate sizing solutions at push-button speed
-%	\end{itemize}
 	\begin{itemize}
 	\item can suggest valid sizings with resulting performance in the vicinity of the required metrics, allowing for exploration of sizings while still fulfilling specifications,
 	\item is highly data efficient,
@@ -78,23 +69,7 @@ This work contributes a machine learning approach that:
 	\end{itemize}
 	
  	In section \ref{sec:intro2}, we provide an overview of the proposed method and its connection to structural analysis, as well as describing the sizing process in detail. In section \ref{sec:ddpm}, a short background of DDPMs and our implemented models are presented. We conclude with a presentation of results for two OpAmps, in section \ref{sec:results}.
-	
-%
-%    With increasing MOSFET model complexity \cite{gatermann22mosfet}, analog design, particularly OpAmp design, remains manual in industrial practice \cite{gielen23workshop}, despite the existence of automatic tools. Various procedural methods for automated design have been discussed in \cite{prautsch16reuse, crossley13bag, schweikardt22scheible}. The idea of using smaller building blocks and hierarchical strategies is successfully demonstrated, e.g., in \cite{meissner15feats, abel2022fuboco, mendhurwar2012structureneural, synthesis23zhang, canelas22hierachical}. 
-%	Early on, modeling  performance characteristics of circuits has been popular, e.g. by symbolic analysis \cite{cuatle10symbolic, wambacq95symbolic}. % or machine learning \cite{doboli03piecewise}.
-%	Some prior works in the machine learning realm follow the idea of skipping or replacing the optimization algorithm by other means such as neural networks (NNs). In~\cite{lourenco18}, artificial neural networks (ANNs) are used to guess circuit sizings; due to modeling the entire netlist with one ANN and including non-optimal results in the former case, the complexity of the learning task is higher and thus large sample sizes (in \cite{lourenco18} $16600$ or roughly $16-160 \, x$ our sample sizes) are required to learn the inverse problem within a smaller performance range. Similarly to our work,  \cite{lourenco19pareto} uses optimal samples for training but without exploiting structural knowledge. In~\cite{gao23rose, settaluri22reinforcement}, reinforcement  algorithms are presented, substituting the optimizer with an NN.
-%%	 while maintaining an iterative nature. 
-%	 Here, the simulation effort is increased as multiple rounds are required for every sizing, similar to traditional optimization. In~\cite{beaulieu23cascaded}, the complexity of the NNs is reduced by having small networks represent single device parameters and cascading them in different ways, feeding outputs of earlier networks to the input of later networks in the tree.
-%	 Unfortunately, with a circuit of e.g. $15$ devices/networks, optimally ordering them in a chain can lead to a complexity of $15!$ in the worst case.
-%	Other works, such as \cite{fayazi23angel, budak23apostle, wolfe03nnmodel, hakhamaneshi23pretraining}, follow the traditional approach of treating sizing as an optimization problem or concentrate on performance modeling. While achieving good accuracy in their findings, they contend with the costly iteration process inherent in optimization.
-%\newline
-%	In this paper, utilizing sampled sizings from the open-source tool FUBOCO \cite{fuboco-github}, we introduce a machine learning algorithm for sizing operational amplifiers \textbf{without the need for optimization and simulation} during the deployment phase. 
-%	\newline
-%	Our approach stands out by \textbf{capitalizing on automatically extracted structural} and \textbf{functional information}, a departure from related works. This brings about benefits in terms of speed, flexibility, and accuracy. The required sample size, setup- and evaluation-time, as well as necessary expert knowledge are kept at a minimum. Additional contributions include the creation of a comprehensive database of netlists, the development of a custom loss function, and the utilization of a quasi-Newton optimizer for training purposes.
-%\newline
-%	 In section \ref{sec:intro2}, we provide an overview of the proposed method and its connection to structural analysis. 
-%	 In sec.~\ref{sec:sizing}, we describe the sizing process in detail. We conclude with a presentation of results for two OpAmps.
-	 
+
 	 	
  	\section{From Structural Analysis to Circuit Sizing via Machine Learning}\label{sec:intro2}
 	\begin{figure}[h]
@@ -134,85 +109,7 @@ This work contributes a machine learning approach that:
 	\end{itemize}
 	Like in the previous work, we enforce symmetry that can be automatically detected by deterministic algorithms. For symmetry within blocks, this is done during training, for symmetry outside of blocks, this is done during recombination.
 			
-%	\begin{figure}[]
-%		\begin{subfigure}{.48\textwidth}
-%			\centering
-%			\includegraphics[width=\linewidth]{figures/simple52_partitioning}
-%			\setlength{\abovecaptionskip}{0ex}%
-%	%		\setlength{\belowcaptionskip}{-2ex}%
-%			\setlength{\belowcaptionskip}{0ex}%
-%			\caption{Folded Cascode Operational Amplifier (OpAmp A).}
-%			\label{fig:simple53}
-%		\end{subfigure}
-%			\hfill
-%		\begin{subfigure}{.5\textwidth}
-%			\centering
-%			\includegraphics[width=\linewidth]{figures/finetuning-networks2}
-%			\setlength{\abovecaptionskip}{-2ex}%
-%	%		\setlength{\belowcaptionskip}{-2ex}%
-%			\caption{Process of transfer learning.}
-%			\label{fig:fine-tuning}
-%		\end{subfigure}
-%			\setlength{\abovecaptionskip}{3ex}%
-%			\setlength{\belowcaptionskip}{-3ex}%
-%%			\caption{Folded Cascode OpAmp (\ref{fig:simple53}) and process of transfer learning (\ref{fig:fine-tuning}): Instead of training one huge network per OpAmp, we can use weights from our database as initial training points to merely fine-tune our networks }
-%			\caption{Instead of training one huge network per OpAmp, we can split an Opamp, e.g. OpAmp A, into blocks (shading and coloring in fig.~\ref{fig:simple53}) and use weights from our network-database as initial training points to merely fine-tune our networks~(\ref{fig:fine-tuning}). }
-%			\label{fig:training-process}
-%		\end{figure}
-		
-%		\begin{figure}[]
-%		\begin{subfigure}{0.12\textwidth}
-%		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/gain}}
-%		\vspace{-1.4\baselineskip}
-%		\caption{{\footnotesize gain ($dB$)}}
-%		\label{fig:53gain}
-%		\vspace{1.3\baselineskip}
-%		\end{subfigure}
-%		\hfill
-%		\begin{subfigure}{0.12\textwidth}
-%		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/ft}}
-%		\vspace{-1.4\baselineskip}
-%		\caption{{\footnotesize trns. fr. ($Mhz$)}}
-%		\label{fig:53ft}
-%		\vspace{1.3\baselineskip}
-%		\end{subfigure}
-%		\hfill
-%		\begin{subfigure}{0.12\textwidth}
-%		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/slew}}
-%		\vspace{-1.4\baselineskip}
-%		\caption{{\footnotesize slew rate ($\frac{V}{\mu s}$)}}
-%		\label{fig:53slew}
-%		\vspace{1.3\baselineskip}
-%		\end{subfigure}
-%		\hfill
-%		\begin{subfigure}{0.12\textwidth}
-%		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/power}}
-%		\vspace{-1.4\baselineskip}
-%		\caption{{\footnotesize power ($mW$)}}
-%		\label{fig:53pow}
-%	%	\vspace{.4\baselineskip}
-%		\end{subfigure}
-%		\hfill
-%		\begin{subfigure}{0.12\textwidth}
-%		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/phase}}
-%		\vspace{-1.4\baselineskip}
-%		\caption{{\footnotesize phase margin}}
-%		\label{fig:53ph}
-%	%	\vspace{.4\baselineskip}
-%		\end{subfigure}
-%		\hfill
-%		\begin{subfigure}{0.12\textwidth}
-%		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/cmrr}}
-%		\vspace{-1.4\baselineskip}
-%		\caption{{\footnotesize CMRR}}
-%		\label{fig:53cmrr}
-%	%	\vspace{.4\baselineskip}
-%		\end{subfigure}
-%		\setlength{\abovecaptionskip}{4ex}%
-%		\setlength{\belowcaptionskip}{-4ex}%
-%		\caption{Histograms of some performance features for the Folded-Cascode OpAmp in Fig.~\ref{fig:simple53}.}
-%		\label{fig:perffeatures53}
-%		\end{figure}
+
 	
 \section{DDPM Background and Implementation}\label{sec:ddpm}
 	Several DDPMs are trained to learn the sizing and respective performance distribution of the different building blocks that make up an OpAmp. DDPMs were first introduced in \cite{ho2020denoisingdiffusionprobabilisticmodels} as a new diffusion model parametrization, which are a class of NNs mostly used in an imaging context, like data generation and restauration. These models are composed of 3 different processes, which are briefly highlighted here:

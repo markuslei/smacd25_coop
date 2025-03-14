@@ -215,7 +215,7 @@ This work contributes a machine learning approach that:
 %		\end{figure}
 	
 \section{DDPM Background and Implementation}\label{sec:ddpm}
-	As mentioned in the previous sections, several DDPMs are trained to learn the sizing and respective performances distribution of the different structures that make up an OpAmp. DDPMs were first introduced in \cite{ho2020denoisingdiffusionprobabilisticmodels} as a new diffusion model parametrization, which are a class of NNs mostly used in an imaging context, like data generation and restauration. These models are composed of 3 different processes, which are briefly highlighted here:
+	Several DDPMs are trained to learn the sizing and respective performances distribution of the different structures that make up an OpAmp. DDPMs were first introduced in \cite{ho2020denoisingdiffusionprobabilisticmodels} as a new diffusion model parametrization, which are a class of NNs mostly used in an imaging context, like data generation and restauration. These models are composed of 3 different processes, which are briefly highlighted here:
 	
 	\subsubsection{Forward Process}
 	First, the training data $x_{0}$ is systematically destroyed by the addition of noise over $T$ sequential timesteps, until a terminal distribution $x_{T}$ is reached. This noise is sampled from a Gaussian distribution and at the end of the $T$ timesteps, the resulting training data distribution resembles itself a Gaussian distribution. This process is demonstrated by equation \ref{eq:forward}, where $\beta_{t}$ is the variance scheduler, a hyperparameter that controls how much noise is added to the data $x$ at each time timestep $t$.
@@ -270,7 +270,7 @@ This work contributes a machine learning approach that:
 	\section{Experimental Results} \label{sec:results}
 	\begin{figure}[]
 		\centering
-		\includegraphics[width=.7\linewidth]{figures/miller_pmos}
+		\includegraphics[width=.5\linewidth]{figures/miller_pmos}
 		%		\setlength{\abovecaptionskip}{0ex}%
 		%		\setlength{\belowcaptionskip}{-2ex}%
 		\caption{Miller OpAmp}
@@ -303,10 +303,10 @@ This work contributes a machine learning approach that:
 		\label{fig:boxplots}
 	\end{figure}
 	
-	We trained our approach on two different OpAmps. One is the Folded-Cascode OpAmp that was previously studied in \cite{leibl24inverse} and whose topology can be seen in figure \ref{fig:simple53}. The other is the Miller OpAmp that is detailed in figure \ref{fig:miller}. After training, we sampled the models for sizings of each entry in the test set of both OpAmps, which corresponded to 118 for the Folded-Cascode and 77 for the Miller OpAmp. After simulating the sampled values, the resulting performances were compared with simulations of the ground truth values. Boxplots of the differences are presented in figure \ref{fig:boxplots}, after removal of some outliers. All obtained results were simulatable. 
+	We trained our approach on two different OpAmps, a Folded-Cascode OpAmp previously studied in \cite{leibl24inverse} shown in figure \ref{fig:simple53} and the Miller OpAmp in figure \ref{fig:miller}. After training, we sampled the models for all ground truth sizings in the test sets of both OpAmps, corresponding to 118 for the Folded-Cascode and 77 for the Miller OpAmp. After simulating the sampled values, the resulting performances were compared with simulations of the ground truth values. Boxplots of the differences are presented in figure~\ref{fig:boxplots}, bar outliers.% All obtained results could be simulated. 
 
 	
-	For the Folded-Cascode OpAmp in figure \ref{fig:boxplotfca}, most boxes are centered around 0, but some performances show a tendency of improvement. Power, ICMR\textsubscript{min} and Vout\textsubscript{min} extend downwards (the predictions' performances are lower than the labels), while Gain and Transit Frequency extend upwards (the predictions' performances are greater than the ground truth sizings). Similar observations can be made for the Miller OpAmp \ref{fig:boxplotmiller}, with the CMRR and Slew Rate having the biggest improvement. Here, the only performance that had a tendency toward deterioration was Power. This shows that the models are able to accurately learn the distribution of the circuits' sizing and respective performances, sometimes finding interesting improvements that might be attributed to learned trade-offs between sizes of the different sub-blocks.
+	For the Folded-Cascode OpAmp in figure~\ref{fig:boxplotfca}, most boxes are centered around 0, but some performances show a tendency of improvement. Power, ICMR\textsubscript{min} and Vout\textsubscript{min} extend downwards (the predictions' performances are lower than the labels), while Gain and Transit Frequency extend upwards (the predictions' performances are greater than the ground truth sizings). Similar observations can be made for the Miller OpAmp \ref{fig:boxplotmiller}, with the CMRR and Slew Rate having the biggest improvement. Here, the only performance that had a tendency toward deterioration was Power. This shows that the models are able to accurately learn the distribution of the circuits' sizing and respective performances, sometimes finding interesting improvements that might be attributed to learned trade-offs between sizes of the different sub-blocks.
 	
 	In a second experiment we sampled the model for the Folded-Cascode OpAmp $100$ times, while keeping the same performance specification. The results can be seen in figure~\ref{fig:histograms53} and table~\ref{tab:device_stats}. Most distributions in the performance space in fig.~\ref{fig:histograms53} exhibit a gaussian behaviour, centered around the ground truth performance marked by a red star. Table~\ref{tab:device_stats} indicates, that the model learns to estimate the different contributions and sensitivities for the individual parameters. 
 	

@@ -39,9 +39,9 @@
 \maketitle
 
 \begin{abstract}
-Quick and effortless exploration of design spaces is of major importance in the face of rapid development cycles, varying specifications and increasingly complex circuits.
+In the realm of analog integrated circuit sizing, quick and effortless exploration of design spaces is of major importance in the face of rapid development cycles, varying specifications and increasingly complex circuits.
 It is also well known, that the exploitation of slack in specifications by making adjustments to transistor device sizes can lead to improved yield.
-We address those challenges by combining two state of the art machine learning approaches to achieve accurate generation of optimal performance points, while also allowing for the possibility to explore nearby sizings that might lead to more robust designs. To this end, a diffusion model is combined with an algorithm, that analyzes the circuit and splits the problem into simpler subproblems. The models are tested on a set of typical operational amplifiers.
+We address those challenges by combining two state of the art machine learning approaches to achieve accurate generation of optimal performance points, while also allowing for the possibility to explore nearby sizings that might lead to more robust designs. To this end, diffusion models are combined with an algorithm, that analyzes the circuit and splits the problem into simpler subproblems. The models are tested on a set of typical operational amplifiers.
 \end{abstract}
 
 %\begin{IEEEkeywords}
@@ -318,7 +318,7 @@ This work contributes a machine learning approach that:
 		\centering
 		\setlength{\abovecaptionskip}{0ex}%
 		\setlength{\belowcaptionskip}{2ex}%
-		\caption{Estimated mean value and standard deviation of W parameter sizes of the Folded-Cascode OpAmp for 100 samples and same performance specification. It can be seen that the standard deviation varies heavily depending on the device. It is appears that the model learns to scale the effects of parameter deviations.}
+		\caption{Estimated mean value and standard deviation of W parameter sizes of the Folded-Cascode OpAmp for 100 samples and same performance specification. It can be seen that the standard deviation varies heavily depending on the device. It appears that the model learns to scale the effects of parameter deviations.}
 		\label{tab:device_stats}
 		\resizebox{.6\linewidth}{!}{
 		\begin{tabular}{lll}
@@ -357,7 +357,7 @@ This work contributes a machine learning approach that:
 	
 	
 \section{Conclusion}
-	We have shown a a machine learning approach to not only reproduce optimal sizings for a given specification, but also helps to explore points in the nearby performance space. In the scenario of sampling multiple times for the same specification, the sampling can be interpreted as adding random noise to the ground truth sizing. The model learns the corresponding covariance matrix. As the standard deviation is not equal for all devices, this behaviour can not mimicked by simply adding noise to an optimal sizing.
+	We have shown a machine learning approach to not only reproduce optimal sizings for a given specification, but also to help explore points in the nearby performance space. In the scenario of sampling multiple times for the same specification, the sampling can be interpreted as adding random noise to the ground truth sizing. The model learns the corresponding covariance matrix. As the standard deviation is not equal for all devices, this behaviour cannot be mimicked by simply adding noise to an optimal sizing.
 
 \bibliographystyle{IEEEtran}
 \bibliography{IEEEabrv,bibtex-base-iee}

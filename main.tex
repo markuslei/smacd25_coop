@@ -102,7 +102,7 @@ This work contributes a machine learning approach that:
         \includegraphics[width=\linewidth]{figures/struct_overview_incl_partition}
 		\setlength{\abovecaptionskip}{0ex}%
 		\setlength{\belowcaptionskip}{-2ex}%
-		\caption{Splitting various OpAmps into canonical building blocks with different functional characteristics and accumulating intrinsic design know-how by training each building block with random optimal samples from all available OpAmps. Indices {\color{red} $b$}, {\color{blue} $l$} and {\color{green} $t$} represent {\color{red}$bias$}, {\color{blue}$load$} and {\color{green}$transconductance$} functionality of devices. Every building block maps the overall OpAmp performance to its sizing. Source \cite{leibl24inverse}.}
+		\caption{Splitting various OpAmps into canonical building blocks with different functional characteristics. Indices {\color{red} $b$}, {\color{blue} $l$} and {\color{green} $t$} represent {\color{red}$bias$}, {\color{blue}$load$} and {\color{green}$transconductance$} functionality of devices. Adapted from \cite{leibl24inverse}.}
 		\label{fig:overview-structure}
 	\end{figure}
 	\setlength{\abovecaptionskip}{1ex}%
@@ -121,7 +121,7 @@ This work contributes a machine learning approach that:
 		\includegraphics[width=\linewidth]{figures/simple52_partitioning}
 %		\setlength{\abovecaptionskip}{0ex}%
 %		\setlength{\belowcaptionskip}{-2ex}%
-		\caption{Folded-Cascode OpAmp. The circuit is decomposed into its structural and functional blocks. Here the structural blocks are shaded, while the functionality of the devices is represented by colours. }
+		\caption{Folded-Cascode OpAmp. The circuit is decomposed into its structural and functional blocks with structural blocks shaded and functionality of the devices represented by colours. }
 		\label{fig:simple53}
 	\end{figure}
 	
@@ -160,59 +160,59 @@ This work contributes a machine learning approach that:
 %			\label{fig:training-process}
 %		\end{figure}
 		
-		\begin{figure}[]
-		\begin{subfigure}{0.12\textwidth}
-		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/gain}}
-		\vspace{-1.4\baselineskip}
-		\caption{{\footnotesize gain ($dB$)}}
-		\label{fig:53gain}
-		\vspace{1.3\baselineskip}
-		\end{subfigure}
-		\hfill
-		\begin{subfigure}{0.12\textwidth}
-		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/ft}}
-		\vspace{-1.4\baselineskip}
-		\caption{{\footnotesize trns. fr. ($Mhz$)}}
-		\label{fig:53ft}
-		\vspace{1.3\baselineskip}
-		\end{subfigure}
-		\hfill
-		\begin{subfigure}{0.12\textwidth}
-		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/slew}}
-		\vspace{-1.4\baselineskip}
-		\caption{{\footnotesize slew rate ($\frac{V}{\mu s}$)}}
-		\label{fig:53slew}
-		\vspace{1.3\baselineskip}
-		\end{subfigure}
-		\hfill
-		\begin{subfigure}{0.12\textwidth}
-		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/power}}
-		\vspace{-1.4\baselineskip}
-		\caption{{\footnotesize power ($mW$)}}
-		\label{fig:53pow}
-	%	\vspace{.4\baselineskip}
-		\end{subfigure}
-		\hfill
-		\begin{subfigure}{0.12\textwidth}
-		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/phase}}
-		\vspace{-1.4\baselineskip}
-		\caption{{\footnotesize phase margin}}
-		\label{fig:53ph}
-	%	\vspace{.4\baselineskip}
-		\end{subfigure}
-		\hfill
-		\begin{subfigure}{0.12\textwidth}
-		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/cmrr}}
-		\vspace{-1.4\baselineskip}
-		\caption{{\footnotesize CMRR}}
-		\label{fig:53cmrr}
-	%	\vspace{.4\baselineskip}
-		\end{subfigure}
-		\setlength{\abovecaptionskip}{4ex}%
-		\setlength{\belowcaptionskip}{-4ex}%
-		\caption{Histograms of some performance features for the Folded-Cascode OpAmp in Fig.~\ref{fig:simple53}.}
-		\label{fig:perffeatures53}
-		\end{figure}
+%		\begin{figure}[]
+%		\begin{subfigure}{0.12\textwidth}
+%		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/gain}}
+%		\vspace{-1.4\baselineskip}
+%		\caption{{\footnotesize gain ($dB$)}}
+%		\label{fig:53gain}
+%		\vspace{1.3\baselineskip}
+%		\end{subfigure}
+%		\hfill
+%		\begin{subfigure}{0.12\textwidth}
+%		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/ft}}
+%		\vspace{-1.4\baselineskip}
+%		\caption{{\footnotesize trns. fr. ($Mhz$)}}
+%		\label{fig:53ft}
+%		\vspace{1.3\baselineskip}
+%		\end{subfigure}
+%		\hfill
+%		\begin{subfigure}{0.12\textwidth}
+%		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/slew}}
+%		\vspace{-1.4\baselineskip}
+%		\caption{{\footnotesize slew rate ($\frac{V}{\mu s}$)}}
+%		\label{fig:53slew}
+%		\vspace{1.3\baselineskip}
+%		\end{subfigure}
+%		\hfill
+%		\begin{subfigure}{0.12\textwidth}
+%		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/power}}
+%		\vspace{-1.4\baselineskip}
+%		\caption{{\footnotesize power ($mW$)}}
+%		\label{fig:53pow}
+%	%	\vspace{.4\baselineskip}
+%		\end{subfigure}
+%		\hfill
+%		\begin{subfigure}{0.12\textwidth}
+%		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/phase}}
+%		\vspace{-1.4\baselineskip}
+%		\caption{{\footnotesize phase margin}}
+%		\label{fig:53ph}
+%	%	\vspace{.4\baselineskip}
+%		\end{subfigure}
+%		\hfill
+%		\begin{subfigure}{0.12\textwidth}
+%		\resizebox{!}{\textwidth}{\includegraphics[]{figures/perf53/cmrr}}
+%		\vspace{-1.4\baselineskip}
+%		\caption{{\footnotesize CMRR}}
+%		\label{fig:53cmrr}
+%	%	\vspace{.4\baselineskip}
+%		\end{subfigure}
+%		\setlength{\abovecaptionskip}{4ex}%
+%		\setlength{\belowcaptionskip}{-4ex}%
+%		\caption{Histograms of some performance features for the Folded-Cascode OpAmp in Fig.~\ref{fig:simple53}.}
+%		\label{fig:perffeatures53}
+%		\end{figure}
 	
 \section{DDPM Background and Implementation}\label{sec:ddpm}
 	As mentioned in the previous sections, several DDPMs are trained to learn the sizing and respective performances distribution of the different structures that make up an OpAmp. DDPMs were first introduced in \cite{ho2020denoisingdiffusionprobabilisticmodels} as a new diffusion model parametrization, which are a class of NNs mostly used in an imaging context, like data generation and restauration. These models are composed of 3 different processes, which are briefly highlighted here:
@@ -303,13 +303,62 @@ This work contributes a machine learning approach that:
 		\label{fig:boxplots}
 	\end{figure}
 	
-	We trained our approach on two different OpAmps. One is the Folded-Cascode OpAmp that was previously studied in \cite{leibl24inverse} and whose topology can be seen in figure \ref{fig:simple53}. The other is the Miller OpAmp that is detailed in figure \ref{fig:miller}. After training, we sampled the models for sizings of each entry in the test set of both OpAmps, which corresponded to 118 for the Folded-Cascode and 77 for the Miller OpAmp. After simulating the sampled values, the resulting performances were compared with the originals and boxplots of the differences are presented in figure \ref{fig:boxplots}, after the removing of some outliers. However, it is important to note that all results were simulatable. 
+	We trained our approach on two different OpAmps. One is the Folded-Cascode OpAmp that was previously studied in \cite{leibl24inverse} and whose topology can be seen in figure \ref{fig:simple53}. The other is the Miller OpAmp that is detailed in figure \ref{fig:miller}. After training, we sampled the models for sizings of each entry in the test set of both OpAmps, which corresponded to 118 for the Folded-Cascode and 77 for the Miller OpAmp. After simulating the sampled values, the resulting performances were compared with simulations of the ground truth values. Boxplots of the differences are presented in figure \ref{fig:boxplots}, after removal of some outliers. All obtained results were simulatable. 
+
 	
-	After careful analysis, for the Folded-Cascode OpAmp in figure \ref{fig:boxplotfca}, the boxes are centered around 0, but some performances show a tendency of improvement, like the Power, ICMR\textsubscript{min} and Vout\textsubscript{min} which extend downwards (meaning the predictions' performances are lower than the labels), while Gain and Transit Frequency extend upwards (meaning the predictions' performances are greater than the labels). The same can be said for the Miller OpAmp \ref{fig:boxplotmiller}, with the CMRR and Slew Rate having the biggest improvement. The only performance that had a deterioration was the Power. This shows that the models are able to accurately learn the distribution of the circuits' sizing and respective performances, sometimes finding interesting improvements that can be attributed to learned trade-offs between sizes of the different sub-blocks.
+	For the Folded-Cascode OpAmp in figure \ref{fig:boxplotfca}, most boxes are centered around 0, but some performances show a tendency of improvement. Power, ICMR\textsubscript{min} and Vout\textsubscript{min} extend downwards (the predictions' performances are lower than the labels), while Gain and Transit Frequency extend upwards (the predictions' performances are greater than the ground truth sizings). Similar observations can be made for the Miller OpAmp \ref{fig:boxplotmiller}, with the CMRR and Slew Rate having the biggest improvement. Here, the only performance that had a tendency toward deterioration was Power. This shows that the models are able to accurately learn the distribution of the circuits' sizing and respective performances, sometimes finding interesting improvements that might be attributed to learned trade-offs between sizes of the different sub-blocks.
+	
+	In a second experiment we sampled the model for the Folded-Cascode OpAmp $100$ times, while keeping the same performance specification. The results can be seen in figure~\ref{fig:histograms53} and table~\ref{tab:device_stats}. Most distributions in the performance space in fig.~\ref{fig:histograms53} exhibit a gaussian behaviour, centered around the ground truth performance marked by a red star. Table~\ref{tab:device_stats} indicates, that the model learns to estimate the different contributions and sensitivities for the individual parameters. 
+	
+	In all cases, the models have been trained with a sample size between $700$ and $1000$ elements. While not quite as efficient as \cite{leibl24inverse}, the sample size is still very low.
+
+	\begin{table}[]
+%		\tiny
+		\centering
+		\setlength{\abovecaptionskip}{0ex}%
+		\setlength{\belowcaptionskip}{2ex}%
+		\caption{Estimated mean value and standard deviation of W parameter sizes of the Folded-Cascode OpAmp for 100 samples and same performance specification. It can be seen that the standard deviation varies heavily depending on the device. It is appears that the model learns to scale the effects of parameter deviations.}
+		\label{tab:device_stats}
+		\resizebox{.6\linewidth}{!}{
+		\begin{tabular}{lll}
+		\toprule
+	 device & mean value & standard deviation \\ 
+	 \midrule
+		0 & $8.52$ & $2.0$ \\
+		1 & $43.26$ & $19.0$ \\
+		2 & $41.74$ & $17.0$ \\
+		3 & $14.4$ & $1.0$ \\
+		4 & $90.98$ & $8.0$ \\
+		5 & $88.47$ & $23.0$ \\
+		6 & $41.74$ & $17.0$ \\
+		7 & $43.26$ & $19.0$ \\
+		8 & $97.88$ & $55.0$ \\
+		9 & $97.88$ & $55.0$ \\
+		10 & $114.78$ & $35.0$ \\
+		11 & $367.21$ & $22.0$ \\
+		12 & $367.21$ & $22.0$ \\
+		13 & $244.11$ & $13.0$ \\
+		14 & $244.11$ & $13.0$ \\
+		\bottomrule
+		\end{tabular}
+		\vspace{-1cm}
+		}\end{table}
+		
+		
+	\begin{figure}[]
+		\centering
+		\includegraphics[width=\linewidth]{figures/histograms_simple53_100samples}
+%		\setlength{\abovecaptionskip}{0ex}%
+%		\setlength{\belowcaptionskip}{-2ex}%
+		\caption{Histograms for $100$ samples of the trained Folded-Cascode OpAmp model with the \textbf{same} performance specification. Most distributions are well shaped around the ground truth from the test set. The performance value of the ground truth sizing is marked by a red star.}
+		\label{fig:histograms53}
+	\end{figure}
+	
+	
 	
 	
 \section{Conclusion}
-	
+	We have shown a a machine learning approach to not only reproduce optimal sizings for a given specification, but also helps to explore points in the nearby performance space. In the scenario of sampling multiple times for the same specification, the sampling can be interpreted as adding random noise to the ground truth sizing. The model learns the corresponding covariance matrix. As the standard deviation is not equal for all devices, this behaviour can not mimicked by simply adding noise to an optimal sizing.
 
 \bibliographystyle{IEEEtran}
 \bibliography{IEEEabrv,bibtex-base-iee}

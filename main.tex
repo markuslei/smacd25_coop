@@ -39,7 +39,7 @@
 \maketitle
 
 \begin{abstract}
-Quick and effortless exploration of design spaces is of major importance in the face of rapid development cycles, varying specifications and increasingly complex circuits.
+In the realm of analog integrated circuit sizing, quick and effortless exploration of design spaces is of major importance in the face of rapid development cycles, varying specifications and increasingly complex circuits.
 It is also well known, that the exploitation of slack in specifications by making adjustments to transistor device sizes can lead to improved yield.
 We address those challenges by combining two state of the art machine learning approaches to achieve accurate generation of optimal performance points, while also allowing for the possibility to explore nearby sizings that might lead to more robust designs. To this end, a diffusion model is combined with an algorithm that analyzes the circuit and splits the problem into simpler subproblems. The models are tested on a set of typical operational amplifiers.
 \end{abstract}
@@ -242,7 +242,7 @@ This work contributes a machine learning approach that:
 		\includegraphics[width=\linewidth]{figures/ForwardReverseDDPM}
 		\setlength{\abovecaptionskip}{0ex}%
 		\setlength{\belowcaptionskip}{-2ex}%
-		\caption{Correlation between forward and reverse processes.}
+		\caption{Correlation between forward and reverse processes \cite{eid24diffusion}.}
 		\label{fig:forward_reverse}
 	\end{figure}
 	
@@ -303,6 +303,7 @@ This work contributes a machine learning approach that:
 		\label{fig:boxplots}
 	\end{figure}
 	
+
 	We trained our approach on two different OpAmps, a Folded-Cascode OpAmp previously studied in \cite{leibl24inverse} shown in figure \ref{fig:simple53} and the Miller OpAmp in figure \ref{fig:miller}. After training, we sampled the models for all ground truth sizings in the test sets of both OpAmps, corresponding to 118 for the Folded-Cascode and 77 for the Miller OpAmp. After simulating the sampled values, the resulting performances were compared with simulations of the ground truth values. Boxplots of the differences are presented in figure~\ref{fig:boxplots}, bar outliers.% All obtained results could be simulated. 
 
 	
@@ -317,7 +318,7 @@ This work contributes a machine learning approach that:
 		\centering
 		\setlength{\abovecaptionskip}{0ex}%
 		\setlength{\belowcaptionskip}{2ex}%
-		\caption{Estimated mean value and standard deviation of W parameter sizes of the Folded-Cascode OpAmp for 100 samples and same performance specification. It can be seen that the standard deviation varies heavily depending on the device. It is appears that the model learns to scale the effects of parameter deviations.}
+		\caption{Estimated mean value and standard deviation of W parameter sizes of the Folded-Cascode OpAmp for 100 samples and same performance specification. It can be seen that the standard deviation varies heavily depending on the device. It appears that the model learns to scale the effects of parameter deviations.}
 		\label{tab:device_stats}
 		\resizebox{.6\linewidth}{!}{
 		\begin{tabular}{lll}
@@ -355,10 +356,8 @@ This work contributes a machine learning approach that:
 	\end{figure}
 	
 	
-	
-	
 \section{Conclusion}
-	We have shown a machine learning approach to not only reproduce optimal sizings for a given specification, but also to explore points in the nearby performance space. In the scenario of sampling multiple times for the same specification, the sampling can be interpreted as adding random noise to the ground truth sizing. The model learns the corresponding covariance matrix. As the standard deviation is not equal for all devices, this behaviour can not be mimicked by simply adding noise to an optimal sizing.
+	We have shown a machine learning approach to not only reproduce optimal sizings for a given specification, but also to help explore points in the nearby performance space. In the scenario of sampling multiple times for the same specification, the sampling can be interpreted as adding random noise to the ground truth sizing. The model learns the corresponding covariance matrix. As the standard deviation is not equal for all devices, this behaviour cannot be mimicked by simply adding noise to an optimal sizing.
 
 \bibliographystyle{IEEEtran}
 \bibliography{IEEEabrv,bibtex-base-iee}

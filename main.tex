@@ -218,7 +218,7 @@ This work contributes a machine learning approach that:
 	Several DDPMs are trained to learn the sizing and respective performance distribution of the different building blocks that make up an OpAmp. DDPMs were first introduced in \cite{ho2020denoisingdiffusionprobabilisticmodels} as a new diffusion model parametrization, which are a class of NNs mostly used in an imaging context, like data generation and restauration. These models are composed of 3 different processes, which are briefly highlighted here:
 	
 	\subsubsection{Forward Process}
-	First, the training data $x_{0}$ is systematically destroyed by the addition of noise over $T$ sequential timesteps, until a terminal distribution $x_{T}$ is reached. This noise is sampled from a Gaussian distribution and at the end of the $T$ timesteps, the resulting training data distribution resembles itself a Gaussian distribution. This process is demonstrated by equation \ref{eq:forward}, where $\beta_{t}$ is the variance scheduler, a hyperparameter that controls how much noise is added to the data $x$ at each time timestep $t$.
+	First, the training data $x_{0}$ is systematically destroyed by the addition of noise over $T$ sequential timesteps, until a terminal distribution $x_{T}$ is reached. This noise is sampled from a Gaussian distribution and at the end of the $T$ timesteps, the resulting training data distribution resembles itself a Gaussian distribution. For example, if $T=10$ then noise is sampled at each timestep and added to the data $10$ times. This process is demonstrated by equation \ref{eq:forward}, where $\beta_{t}$ is the variance schedule, a hyperparameter that controls how much noise is added to the data $x$ at each time timestep $t$.
 	
 	\begin{equation} \label{eq:forward}
 	\begin{aligned}
@@ -227,7 +227,7 @@ This work contributes a machine learning approach that:
 	\end{equation}
 	
 	\subsubsection{Reverse Process}
-	After the data is destroyed until $x_{t}$, an ANN is trained to try to reverse the forward process, either by predicting the original data $x_{0}$ up front, or by predicting another value that can be used to reconstruct the original data, like the added noise, etc. This process is represented by equation \ref{eq:reverse}, where $\alpha_{t}=1-\beta_{t}$ and $\overline{\alpha}_{t}=\prod_{s=1}^{t}\alpha_{s}$.
+	After the data is destroyed until $x_{t}$, an ANN is trained to try to reverse the forward process, either by predicting the original data $x_{0}$ up front, or by predicting another value that can be used to reconstruct the original data, like the added noise $\epsilon$, etc. This process is represented by equation \ref{eq:reverse}, where $\alpha_{t}=1-\beta_{t}$ and $\overline{\alpha}_{t}=\prod_{s=1}^{t}\alpha_{s}$.
 	
 	\begin{equation} \label{eq:reverse}
 	\begin{split}
@@ -251,17 +251,17 @@ This work contributes a machine learning approach that:
 		\includegraphics[width=\linewidth]{figures/DDPMSubBlockTraining}
 		\setlength{\abovecaptionskip}{0ex}%
 		\setlength{\belowcaptionskip}{-2ex}%
-		\caption{Training phase for sizing an OpAmp. After the decomposition into sub-blocks, noise is added to the respective sizings. A DDPM is trained for each sub-block to predict the original sizing values.}
+		\caption{Training phase for sizing an OpAmp. After the decomposition into sub-blocks, noise is added to the respective sizings. A DDPM is trained for each sub-block to predict the original sizing values. The respective performances of the original sizings are given as guidance.}
 		\label{fig:DDPMtraining}
 	\end{figure}
 	
 	\subsubsection{Sampling Process}
-	Finally, after the model is trained, the sampling process is used to generate new data. The model learned to reverse the forward process, and so, when giving it pure Gaussian noise, it tries to reverse the noise addition until arriving at the original data. Except this time, there is no actual data to begin with, marking this a form of generative AI. This stage is similar to the training phase shown in figure \ref{fig:DDPMtraining}, except random noise is given to the network instead of the noisy sizings.
+	Finally, after the model is trained, the sampling process is used to generate new data. The model learned to reverse the forward process, and so, when giving it pure Gaussian noise, it tries to reverse the noise addition until arriving at the original data. Except this time, there is no actual data to begin with, marking this a form of generative AI. This stage is similar to the training phase shown in figure \ref{fig:DDPMtraining}, except random noise is given as input to the network instead of the noisy sizings.
 	
 	It was shown by \cite{eid24diffusion} that DDPMs produce interesting results when applied to the inverse sizing problem. In this work, a similar implementation is considered, with a cosine schedule for $\beta$ and classifier-free guidance \cite{ho2022classifierfreediffusionguidance}, but with 2 key differences:
 	
 	\begin{itemize}
-		\item instead of predicting the noise $\epsilon$, we implement a model that predicts a velocity equation $v=\alpha_{t}\epsilon - \sigma_{t}x$ which has been shown to enable a true signal-to-noise ratio of $0$ at the last timestep $T$ (meaning that at the last timstep the input of the model is pure Gaussian noise), as opposed to other DDPM parametrizations. This removes an important discrepancy between training and inference \cite{lin2024commondiffusionnoiseschedules};
+		\item instead of predicting the noise $\epsilon$, we implement a model that predicts a velocity equation $v_{t}=\alpha_{t}\epsilon - \sigma_{t}x$ which has been shown to enable a true signal-to-noise ratio of $0$ at the last timestep $T$ (meaning that at the last timstep the input of the model is pure Gaussian noise), as opposed to other DDPM parametrizations. This removes an important discrepancy between training and inference \cite{lin2024commondiffusionnoiseschedules};
 		\item the backbone of the model implemented  is a transformer, with an architecture similar to the "adaLN-Zero" model of  \cite{peebles2023scalablediffusionmodelstransformers}, as opposed to the simple multi-layer perceptrons implemented by \cite{eid24diffusion}. To predict a more complex value in $v$, a stronger architecture was required.
 	\end{itemize}
 	

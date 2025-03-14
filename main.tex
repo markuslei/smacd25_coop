@@ -121,7 +121,8 @@ This work contributes a machine learning approach that:
 	Several DDPMs are trained to learn the sizing and respective performance distribution of the different building blocks that make up an OpAmp. DDPMs were first introduced in \cite{ho2020denoisingdiffusionprobabilisticmodels} as a new diffusion model parametrization, which are a class of NNs mostly used in an imaging context, like data generation and restauration. These models are composed of 3 different processes, which are briefly highlighted here:
 	
 	\subsubsection{Forward Process}
-	First, the training data $x_{0}$ is systematically destroyed by the addition of noise over $T$ sequential steps, in the literature called timesteps, until a terminal distribution $x_{T}$ is reached. This noise is sampled from a Gaussian distribution and at the end of the $T$ timesteps, the resulting training data distribution resembles itself a Gaussian distribution. For example, if $T=10$ then noise is sampled at each timestep and added to the data $10$ times. This process is demonstrated by equation \ref{eq:forward}, where $\beta_{t}$ is the variance schedule, a hyperparameter that controls how much noise is added to the data $x$ at each time timestep $t$.
+	First, the training data $x_{0}$ is systematically destroyed by the addition of noise over $T$ sequential steps, in the literature called timesteps, until a terminal distribution $x_{T}$ is reached. This noise is sampled from a Gaussian distribution and at the end of the $T$ timesteps, the resulting training data distribution resembles itself a Gaussian distribution. %For example, if $T=10$ then noise is sampled at each timestep and added to the data $10$ times. 
+	This process is demonstrated by equation \ref{eq:forward}, where $\beta_{t}$ is the variance schedule, a hyperparameter that controls how much noise is added to the data $x$ at each time timestep $t$.
 	
 	\begin{equation} \label{eq:forward}
 	\begin{aligned}

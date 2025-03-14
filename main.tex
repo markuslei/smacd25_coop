@@ -112,7 +112,7 @@ This work contributes a machine learning approach that:
  	While the structure of the blocks is defined by their devices and interconnections, we identify three functional properties, \textit{bias, load} or \textit{transconductance}, for each individual transistor. This leads to further discrimination among the structural blocks. But because not every combination of functional properties is useful, the total set of possible structures remains small. 
 	All possible variants of blocks can be found in figure~\ref{fig:overview-structure}.
 	
-	An example of decomposing a Folded-Cascode OpAmp into blocks can be seen in figure~\ref{fig:simple53}. Its structural building blocks are shaded, the names annotated close by.
+	An example of decomposing a Folded-Cascode OpAmp (FCOA) into blocks can be seen in figure~\ref{fig:simple53}. Its structural building blocks are shaded, the names annotated close by.
 	Structural and functional block recognition is fully automated. The time required for this is much less than one second. 
 	
 \subsection{Overview of the Method}
@@ -121,7 +121,7 @@ This work contributes a machine learning approach that:
 		\includegraphics[width=\linewidth]{figures/simple52_partitioning}
 %		\setlength{\abovecaptionskip}{0ex}%
 %		\setlength{\belowcaptionskip}{-2ex}%
-		\caption{Folded-Cascode OpAmp. The circuit is decomposed into its structural and functional blocks with structural blocks shaded and functionality of the devices represented by colours. }
+		\caption{Folded-Cascode OpAmp (FCOA). The circuit is decomposed into its structural and functional blocks with structural blocks shaded and functionality of the devices represented by colours. }
 		\label{fig:simple53}
 	\end{figure}
 	
@@ -235,7 +235,7 @@ This work contributes a machine learning approach that:
 	\end{split}
 	\end{equation}
 	
-	The correlation between the forward and reverse process to noise and denoise images can be seen in figure \ref{fig:forward_reverse}. An overview of the training phase for the Folded-Cascode OpAmp of figure \ref{fig:simple53} can be seen in figure \ref{fig:DDPMtraining}.
+	The correlation between the forward and reverse process to noise and denoise images can be seen in fig.~\ref{fig:forward_reverse}. An overview of the training phase for the FCOA of fig.~\ref{fig:simple53} can be seen in fig.~\ref{fig:DDPMtraining}.
 	
 	\begin{figure}[h]
 		\centering
@@ -273,7 +273,7 @@ This work contributes a machine learning approach that:
 		\includegraphics[width=.5\linewidth]{figures/miller_pmos}
 		%		\setlength{\abovecaptionskip}{0ex}%
 		%		\setlength{\belowcaptionskip}{-2ex}%
-		\caption{Miller OpAmp}
+		\caption{Miller OpAmp (MOA)}
 		\label{fig:miller}
 	\end{figure}
 	
@@ -299,26 +299,25 @@ This work contributes a machine learning approach that:
 		\setlength{\abovecaptionskip}{3ex}%
 		\setlength{\belowcaptionskip}{-3ex}%
 		%			\caption{Folded Cascode OpAmp (\ref{fig:simple53}) and process of transfer learning (\ref{fig:fine-tuning}): Instead of training one huge network per OpAmp, we can use weights from our database as initial training points to merely fine-tune our networks }
-		\caption{Boxplots of the percentage of differences in performances for the test set of both tested OpAmps, after removal of outliers. }
+		\caption{Boxplots of the percentage of differences in performances for the test set of both tested OpAmps, after removal of outliers. The innermost line represents the median, the box $50\%$ of the data. }
 		\label{fig:boxplots}
 	\end{figure}
 	
 
-	We trained our approach on two different OpAmps, a Folded-Cascode OpAmp previously studied in \cite{leibl24inverse} shown in figure \ref{fig:simple53} and the Miller OpAmp in figure \ref{fig:miller}. After training, we sampled the models for all ground truth sizings in the test sets of both OpAmps, corresponding to 118 for the Folded-Cascode and 77 for the Miller OpAmp. After simulating the sampled values, the resulting performances were compared with simulations of the ground truth values. Boxplots of the differences are presented in figure~\ref{fig:boxplots}, bar outliers.% All obtained results could be simulated. 
-
+	We trained our approach on two different OpAmps, a Folded-Cascode OpAmp (FCOA) previously studied in \cite{leibl24inverse} shown in figure \ref{fig:simple53} and the Miller OpAmp in figure \ref{fig:miller}. After training, we sampled the models for all ground truth sizings in the test sets of both OpAmps, corresponding to 118 for the FCOA and 77 for the Miller OpAmp. After simulating the sampled values, the resulting performances were compared with simulations of the ground truth values. 
+	All models have been trained with a sample size between $700$ and $1000$ elements. While slightly less efficient as \cite{leibl24inverse}, the price for added flexibility, the sample sizes are very low.
 	
-	For the Folded-Cascode OpAmp in figure~\ref{fig:boxplotfca}, most boxes are centered around 0, but some performances show a tendency of improvement. Power, ICMR\textsubscript{min} and Vout\textsubscript{min} extend downwards (the predictions' performances are lower than the labels), while Gain and Transit Frequency extend upwards (the predictions' performances are greater than the ground truth sizings). Similar observations can be made for the Miller OpAmp \ref{fig:boxplotmiller}, with the CMRR and Slew Rate having the biggest improvement. Here, the only performance that had a tendency toward deterioration was Power. This shows that the models are able to accurately learn the distribution of the circuits' sizing and respective performances, sometimes finding interesting improvements that might be attributed to learned trade-offs between sizes of the different sub-blocks.
+	Boxplots of the relative performance differences are presented in figure~\ref{fig:boxplots}, bar outliers.
+	For the FCOA in figure~\ref{fig:boxplotfca}, most boxes are centered around 0 (i.e. the ground truth), but some performances show a tendency of improvement. For Power, ICMR\textsubscript{min} and Vout\textsubscript{min} median and box extend downwards (the predictions' performances are lower than the labels), while Gain and Transit Frequency median and box extend upwards (the predictions' performances are greater than the ground truth sizings). Similar observations can be made for the Miller OpAmp \ref{fig:boxplotmiller}, with the CMRR and Slew Rate having the biggest improvement. Here, the only performance that showed a tendency toward deterioration was Power. This shows that the models are able to accurately learn the distribution of the circuits' sizing and respective performances, sometimes finding interesting improvements that might be attributed to learned trade-offs between sizes of the different sub-blocks.
 	
-	In a second experiment we sampled the model for the Folded-Cascode OpAmp $100$ times, while keeping the same performance specification. The results can be seen in figure~\ref{fig:histograms53} and table~\ref{tab:device_stats}. Most distributions in the performance space in fig.~\ref{fig:histograms53} exhibit a gaussian behaviour, centered around the ground truth performance marked by a red star. Table~\ref{tab:device_stats} indicates, that the model learns to estimate the different contributions and sensitivities for the individual parameters. 
-	
-	In all cases, the models have been trained with a sample size between $700$ and $1000$ elements. While not quite as efficient as \cite{leibl24inverse}, the sample size is still very low.
+	In a second experiment we sampled the model for the FCOA $100$ times, while keeping the same performance specification. The results can be seen in figure~\ref{fig:histograms53} and table~\ref{tab:device_stats}. Most distributions in the performance space in fig.~\ref{fig:histograms53} exhibit a gaussian behaviour, centered around the ground truth performance marked by a red star. Table~\ref{tab:device_stats} indicates that the model learns to estimate the different contributions and sensitivities for the individual parameters. 
 
 	\begin{table}[]
 %		\tiny
 		\centering
 		\setlength{\abovecaptionskip}{0ex}%
 		\setlength{\belowcaptionskip}{2ex}%
-		\caption{Estimated mean value and standard deviation of W parameter sizes of the Folded-Cascode OpAmp for 100 samples and same performance specification. It can be seen that the standard deviation varies heavily depending on the device. It appears that the model learns to scale the effects of parameter deviations.}
+		\caption{Estimated mean value and standard deviation of W parameter sizes of the FCOA for 100 samples and same performance specification. It can be seen that the standard deviation varies heavily depending on the device. It appears that the model learns to scale the effects of parameter deviations.}
 		\label{tab:device_stats}
 		\resizebox{.6\linewidth}{!}{
 		\begin{tabular}{lll}
@@ -351,7 +350,7 @@ This work contributes a machine learning approach that:
 		\includegraphics[width=\linewidth]{figures/histograms_simple53_100samples}
 %		\setlength{\abovecaptionskip}{0ex}%
 %		\setlength{\belowcaptionskip}{-2ex}%
-		\caption{Histograms for $100$ samples of the trained Folded-Cascode OpAmp model with the \textbf{same} performance specification. Most distributions are well shaped around the ground truth from the test set. The performance value of the ground truth sizing is marked by a red star.}
+		\caption{Histograms for $100$ samples of the trained FCOA model with the \textbf{same} performance specification. Most distributions are well shaped around the ground truth from the test set. The performance value of the ground truth sizing is marked by a red star.}
 		\label{fig:histograms53}
 	\end{figure}
 	

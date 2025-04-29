@@ -28,7 +28,7 @@ Parts of this work have been done within the collaborative project HoLoDEC funde
 \author{\small  Filipe $\text{Azevedo*}^{\text{1}}$, Markus $\text{Leibl*}^{\text{2}}$, Ricardo $\text{Martins}^{\text{1}}$ and Helmut $\text{Graeb}^{\text{2}}$\\ 
 $^1$Instituto de Telecomunicações / Instituto Superior Técnico - Universidade de Lisboa\\
 $^2$Technical University of Munich, Chair of Electronic Design Automation\\
-\{filipepazevedo@gmail.com, markus.leibl@tum.de, ricmartins@lx.it.pt, helmut.graeb@tum.de\}}
+\{filipe.p.azevedo@tecnico.ulisboa.pt, markus.leibl@tum.de, ricmartins@lx.it.pt, helmut.graeb@tum.de\}}
 
 %\author{\IEEEauthorblockN{Markus Leibl}
 %\IEEEauthorblockA{
@@ -167,10 +167,10 @@ This work contributes a ML approach that:
 	\subsubsection{Sampling Process}
 	Finally, after the model is trained, the sampling process is used to generate new data. The model learned to reverse the forward process, and so, when giving it pure Gaussian noise, it tries to reverse the noise addition until arriving at the original data. Except this time, there is no actual data to begin with, marking this a form of generative artificial intelligence. This stage is similar to the training phase shown in Fig. \ref{fig:DDPMtraining}, except random noise is given as input to the network instead of the noisy sizings.
 	
-	It was shown by \cite{eid24diffusion} that DDPMs produce interesting results when applied to the inverse sizing problem. In this work, a similar implementation is considered, with a cosine schedule for $\beta$ and classifier-free guidance \cite{ho2022classifierfreediffusionguidance}, but with 2 key differences:
+	It was shown by \cite{eid24diffusion} that DDPMs produce interesting results when applied to the inverse sizing problem. In this work, a similar implementation is considered, with a cosine schedule without clipping \cite{lin2024commondiffusionnoiseschedules} for $\beta_t$ and classifier-free guidance \cite{ho2022classifierfreediffusionguidance}, but with 2 key differences:
 	
 	\begin{itemize}
-		\item instead of predicting the noise $\epsilon$, we implement a model that predicts a velocity equation $v_{t}=\alpha_{t}\epsilon - \sigma_{t}x$ which has been shown to enable a true signal-to-noise ratio of $0$ at the last timestep $T$ (meaning that at the last timstep the input of the model is pure Gaussian noise), as opposed to other DDPM parametrizations. This removes an important discrepancy between training and inference \cite{lin2024commondiffusionnoiseschedules};
+		\item instead of predicting the noise $\epsilon$, we implement a model that predicts a velocity equation $v_{t}=\alpha_{t}\epsilon - \sigma_{t}x$ which has been shown to enable a true signal-to-noise ratio of $0$ at the last timestep $T$ (meaning that at the last timstep the input of the model is pure Gaussian noise), as opposed to other DDPM parametrizations. This removes an important discrepancy between training (where the model would never see pure noise) and inference \cite{lin2024commondiffusionnoiseschedules};
 		\item the backbone of the model implemented  is a transformer, with an architecture similar to the ``adaLN-Zero'' model of  \cite{peebles2023scalablediffusionmodelstransformers}, as opposed to the simple multi-layer perceptrons implemented by \cite{eid24diffusion}. To predict a more complex value in $v$, a stronger architecture was required.
 	\end{itemize}
 	
@@ -221,7 +221,7 @@ This work contributes a ML approach that:
 	Boxplots of the relative performance differences are presented in Fig.~\ref{fig:boxplots}, bar outliers.
 	For the FCOA in Fig.~\ref{fig:boxplotfca}, most boxes are centered around $0$ (i.e. the ground truth), but some performances show a tendency of improvement. For Power, ICMR\textsubscript{min} and Vout\textsubscript{min} median and box extend downwards (the predictions' performances are lower than the labels), while Gain and Transit Frequency median and box extend upwards (the predictions' performances are greater than the ground truth sizings). Similar observations can be made for the MOA in Fig.~\ref{fig:boxplotmiller}, with the CMRR and Slew Rate having the biggest improvement. Here, the only performance that showed a tendency toward deterioration was Power. This shows that the models are able to accurately learn the distribution of the circuits' sizing and respective performances, sometimes finding interesting improvements that might be attributed to learned trade-offs between sizes of the different sub-blocks.
 	
-	In a second experiment we sampled the model for the FCOA $100$ times, while keeping the same performance specification. The results can be seen in Fig.~\ref{fig:histograms53} and table~\ref{tab:device_stats}. Most distributions in the performance space in Fig.~\ref{fig:histograms53} exhibit a gaussian behaviour, centered around the ground truth performance marked by a red star. Table~\ref{tab:device_stats} indicates that the model learns to estimate the different contributions and sensitivities for the individual parameters. It can be seen that the standard deviation varies heavily depending on the device, indicating that the model learns to scale the effects of parameter deviations.
+	In a second experiment we sampled the model for the FCOA $100$ times, while keeping the same performance specification. The results can be seen in Fig.~\ref{fig:histograms53} and Table~\ref{tab:device_stats}. Most distributions in the performance space in Fig.~\ref{fig:histograms53} exhibit a gaussian behaviour, centered around the ground truth performance marked by a red star. Table~\ref{tab:device_stats} indicates that the model learns to estimate the different contributions and sensitivities for the individual parameters. It can be seen that the standard deviation varies heavily depending on the device, indicating that the model learns to scale the effects of parameter deviations.
 
 	\setlength{\textfloatsep}{0.4cm}
 	\begin{table}[]
